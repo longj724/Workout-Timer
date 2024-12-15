@@ -5,7 +5,6 @@ import { useRouter } from 'expo-router';
 
 // Internal Dependencies
 import { IntervalItem } from '~/components/ui/IntervalItem';
-import { NewIntervalDialog } from '~/components/ui/NewIntervalDialog';
 
 interface Interval {
   id: string;
@@ -27,48 +26,16 @@ export default function Home() {
     router.push('/(modals)/AddInterval');
   };
 
-  const handleRepetitionChange = (id: string, change: number) => {
-    setIntervals(
-      intervals.map((interval) => {
-        if (interval.id === id) {
-          return {
-            ...interval,
-            repetitions: Math.max(1, interval.repetitions + change),
-          };
-        }
-        return interval;
-      })
-    );
-  };
-
-  const handleAddInterval = ({
-    title,
-    duration,
-  }: {
-    title: string;
-    duration: string;
-  }) => {
-    const newInterval = {
-      id: (intervals.length + 1).toString(),
-      title,
-      duration,
-      repetitions: 1,
-    };
-    setIntervals([...intervals, newInterval]);
-  };
-
   return (
     <View className="flex-1 bg-background p-4">
-      <Text className="text-foreground text-4xl font-bold mb-8">
-        Workout Timer
-      </Text>
+      <Text className="text-foreground text-2xl font-bold mb-4">Workout</Text>
 
       {intervals.map((interval) => (
         <IntervalItem
           key={interval.id}
           {...interval}
-          onIncrement={() => handleRepetitionChange(interval.id, 1)}
-          onDecrement={() => handleRepetitionChange(interval.id, -1)}
+          onEdit={() => {}}
+          onDelete={() => {}}
         />
       ))}
 

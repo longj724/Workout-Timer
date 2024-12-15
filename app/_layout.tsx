@@ -100,6 +100,19 @@ function RootLayoutNav() {
           title: 'Add Interval',
         }}
       />
+      <Stack.Screen
+        name="(modals)/EditInterval"
+        options={{
+          gestureEnabled: false,
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Text>Cancel</Text>
+            </TouchableOpacity>
+          ),
+          presentation: 'modal',
+          title: 'Edit Interval',
+        }}
+      />
     </Stack>
   );
 }

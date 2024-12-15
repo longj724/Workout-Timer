@@ -1,47 +1,135 @@
-import { View, Text, Pressable } from 'react-native';
+// External Dependencies
+import { View, Text, Pressable, PlatformColor } from 'react-native';
+import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { TimerPickerModal } from 'react-native-timer-picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Audio } from 'expo-av';
+import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
+
+// Internal Dependencies
+import { BottomSheet } from '~/components/ui/bottom-sheet';
 
 interface IntervalItemProps {
   id: string;
   title: string;
   duration: string;
   repetitions: number;
-  onIncrement: () => void;
-  onDecrement: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 export function IntervalItem({
+  id,
   title,
   duration,
   repetitions,
-  onIncrement,
-  onDecrement,
+  onEdit,
+  onDelete,
 }: IntervalItemProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isTimerPickerOpen, setIsTimerPickerOpen] = useState(false);
+
   return (
-    <View className="bg-card rounded-lg p-4 mb-4 shadow-md shadow-foreground/10">
-      <View className="flex-row justify-between items-center">
-        <View>
-          <Text className="text-foreground text-xl font-semibold">{title}</Text>
-          <Text className="text-foreground/60">{duration}</Text>
-        </View>
+    <>
+      <View className="bg-card rounded-lg p-4 mb-4 shadow-md shadow-foreground/10">
+        <View className="flex-row justify-between items-center">
+          <View className="flex-col">
+            <View className="flex-row items-center gap-2">
+              <Text className="text-foreground text-lg font-semibold">
+                {title}
+              </Text>
+              <Pressable
+                className="bg-muted px-4 py-2 rounded-md"
+                onPress={() => setIsTimerPickerOpen(true)}
+              >
+                <Text className="text-foreground text-md">x{repetitions}</Text>
+              </Pressable>
+            </View>
+            <Text className="text-foreground/60 text-lg">{duration}</Text>
+          </View>
 
-        <View className="flex-row items-center">
           <Pressable
-            onPress={onDecrement}
-            className="bg-muted w-8 h-8 rounded-full items-center justify-center"
+            onPress={() => setIsMenuOpen(true)}
+            className="w-10 h-10 items-center justify-center"
           >
-            <Text className="text-foreground text-lg">-</Text>
-          </Pressable>
-
-          <Text className="text-foreground text-lg mx-4">{repetitions}</Text>
-
-          <Pressable
-            onPress={onIncrement}
-            className="bg-muted w-8 h-8 rounded-full items-center justify-center"
-          >
-            <Text className="text-foreground text-lg">+</Text>
+            <Ionicons name="ellipsis-horizontal" size={24} color="#666" />
           </Pressable>
         </View>
       </View>
-    </View>
+
+      {isTimerPickerOpen && (
+        <TimerPickerModal
+          // Have to conform to timer props
+          initialValue={{ seconds: repetitions }}
+          visible={isTimerPickerOpen}
+          setIsVisible={setIsTimerPickerOpen}
+          onConfirm={(selectedRepetitions) => {
+            console.log(selectedRepetitions);
+          }}
+          confirmButtonText="Save"
+          secondLabel="x"
+          padMinutesWithZero={false}
+          padSecondsWithZero={false}
+          hideHours={true}
+          hideMinutes={true}
+          modalTitle="Repetitions"
+          onCancel={() => setIsTimerPickerOpen(false)}
+          closeOnOverlayPress
+          Audio={Audio}
+          LinearGradient={LinearGradient}
+          Haptics={Haptics}
+          styles={{
+            cancelButton: {
+              backgroundColor: PlatformColor('systemRed'),
+              color: 'white',
+              borderColor: PlatformColor('systemRed'),
+            },
+            confirmButton: {
+              backgroundColor: 'black',
+              color: 'white',
+              borderColor: 'black',
+            },
+          }}
+        />
+      )}
+
+      <BottomSheet isVisible={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
+        <View className="p-4 pb-8">
+          <Pressable
+            onPress={() => {
+              setIsMenuOpen(false);
+              router.push({
+                pathname: '/(modals)/EditInterval',
+                params: {
+                  id: id,
+                  initialName: title,
+                  initialTimers: JSON.stringify([
+                    { minutes: 0, seconds: parseInt(duration) },
+                  ]),
+                  initialRepetitions: repetitions.toString(),
+                },
+              });
+            }}
+            className="flex-row items-center py-4 border-b border-muted"
+          >
+            <Ionicons name="pencil" size={24} color="#666" className="mr-3" />
+            <Text className="text-foreground text-lg">Edit Interval</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => {
+              onDelete();
+              setIsMenuOpen(false);
+            }}
+            className="flex-row items-center py-4"
+          >
+            <Ionicons name="trash" size={24} color="#dc2626" className="mr-3" />
+            <Text className="text-red-600 text-lg">Delete Interval</Text>
+          </Pressable>
+        </View>
+      </BottomSheet>
+    </>
   );
 }
