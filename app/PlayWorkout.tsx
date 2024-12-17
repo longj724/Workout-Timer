@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { useLocalSearchParams } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 // Internal Dependencies
 import { Interval, Timer } from '~/lib/types';
@@ -24,6 +25,11 @@ const PlayWorkout = () => {
   const [curTimerTotalSeconds, setCurTimerTotalSeconds] = useState(0);
   const [curRepetition, setCurRepetition] = useState(1);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [workoutStats, setWorkoutStats] = useState({
+    totalTime: 0,
+    completedIntervals: 0,
+    completedTimers: 0,
+  });
 
   useEffect(() => {
     setCurTimers(intervals[currentIntervalIndex].timers);
@@ -73,7 +79,30 @@ const PlayWorkout = () => {
           setKey(`${currentIntervalIndex + 1},0,1`);
           setCurrentIntervalIndex((prev) => prev + 1);
         } else {
-          // Some logic to handle the end of the workout
+          // Calculate final workout stats
+          const totalTime = intervals.reduce((acc, interval) => {
+            const intervalTime = interval.timers.reduce(
+              (timerAcc, timer) =>
+                timerAcc + (timer.minutes * 60 + timer.seconds),
+              0
+            );
+            return acc + intervalTime * interval.repetitions;
+          }, 0);
+
+          // Navigate to workout complete with stats
+          router.push({
+            pathname: '/WorkoutComplete',
+            params: {
+              stats: JSON.stringify({
+                totalTime,
+                totalIntervals: intervals.length,
+                totalRepetitions: intervals.reduce(
+                  (acc, interval) => acc + interval.repetitions,
+                  0
+                ),
+              }),
+            },
+          });
         }
       }
     }

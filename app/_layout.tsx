@@ -113,6 +113,29 @@ function RootLayoutNav() {
           title: 'Edit Interval',
         }}
       />
+      <Stack.Screen
+        name="PlayWorkout"
+        options={{
+          title: 'Play Workout',
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Text>Cancel</Text>
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="WorkoutComplete"
+        options={{
+          title: 'Workout Complete',
+
+          headerRight: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Text>Complete</Text>
+            </TouchableOpacity>
+          ),
+        }}
+      />
     </Stack>
   );
 }
