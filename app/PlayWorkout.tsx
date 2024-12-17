@@ -1,8 +1,9 @@
 // External Dependencies
-import { View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { useState, useCallback, useEffect } from 'react';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { useLocalSearchParams } from 'expo-router';
+import { AntDesign } from '@expo/vector-icons';
 
 // Internal Dependencies
 import { Interval, Timer } from '~/lib/types';
@@ -22,6 +23,7 @@ const PlayWorkout = () => {
   const [curTimerIndex, setCurTimerIndex] = useState(0);
   const [curTimerTotalSeconds, setCurTimerTotalSeconds] = useState(0);
   const [curRepetition, setCurRepetition] = useState(1);
+  const [isPlaying, setIsPlaying] = useState(true);
 
   useEffect(() => {
     setCurTimers(intervals[currentIntervalIndex].timers);
@@ -84,6 +86,17 @@ const PlayWorkout = () => {
     }
   }, [currentIntervalIndex, intervals.length]);
 
+  const handlePlayPause = () => {
+    setIsPlaying((prev) => !prev);
+  };
+
+  const handleNextTimer = () => {
+    if (curTimerIndex < curTimers.length - 1) {
+      setCurTimerIndex((prev) => prev + 1);
+      setKey(`${currentIntervalIndex},${curTimerIndex + 1},${curRepetition}`);
+    }
+  };
+
   const formatTime = (remainingTime: number) => {
     const minutes = Math.floor(remainingTime / 60);
     const seconds = remainingTime % 60;
@@ -116,28 +129,49 @@ const PlayWorkout = () => {
         </Text>
       </View>
 
-      <CountdownCircleTimer
-        key={key}
-        isPlaying
-        duration={curTimerTotalSeconds}
-        colors={['#004777', '#F7B801', '#A30000', '#A30000']}
-        colorsTime={[
-          curTimerTotalSeconds,
-          curTimerTotalSeconds * 0.6,
-          curTimerTotalSeconds * 0.3,
-          0,
-        ]}
-        onComplete={handleComplete}
-      >
-        {({ remainingTime }) => formatTime(remainingTime)}
-      </CountdownCircleTimer>
+      <View style={{ alignItems: 'center', gap: 16 }}>
+        <CountdownCircleTimer
+          key={key}
+          isPlaying={isPlaying}
+          duration={curTimerTotalSeconds}
+          colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+          colorsTime={[
+            curTimerTotalSeconds,
+            curTimerTotalSeconds * 0.6,
+            curTimerTotalSeconds * 0.3,
+            0,
+          ]}
+          onComplete={handleComplete}
+        >
+          {({ remainingTime }) => formatTime(remainingTime)}
+        </CountdownCircleTimer>
 
-      <Button
-        onPress={handleNext}
-        disabled={currentIntervalIndex === intervals.length - 1}
-      >
-        <Text>Next Interval</Text>
-      </Button>
+        <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+          <TouchableOpacity onPress={handlePlayPause}>
+            <AntDesign
+              name={isPlaying ? 'pausecircle' : 'playcircleo'}
+              size={28}
+              color="#000"
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleNextTimer}
+            disabled={curTimerIndex >= curTimers.length - 1}
+            style={{ opacity: curTimerIndex >= curTimers.length - 1 ? 0.5 : 1 }}
+          >
+            <AntDesign name="stepforward" size={28} color="#000" />
+          </TouchableOpacity>
+
+          <Button
+            onPress={handleNext}
+            disabled={currentIntervalIndex === intervals.length - 1}
+            style={{ paddingHorizontal: 20 }}
+          >
+            <Text>Next Interval</Text>
+          </Button>
+        </View>
+      </View>
     </View>
   );
 };
