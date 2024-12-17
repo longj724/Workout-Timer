@@ -14,6 +14,7 @@ import { PlatformColor } from 'react-native';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
+import { Timer } from '~/lib/types';
 
 const intervalSchema = z.object({
   name: z.string().optional(),
@@ -31,18 +32,12 @@ const intervalSchema = z.object({
 
 type IntervalForm = z.infer<typeof intervalSchema>;
 
-type ITimerPicker = {
-  hours?: number;
-  minutes?: number;
-  seconds?: number;
-};
-
 const EditInterval = () => {
   const params = useLocalSearchParams();
   const { id, initialName, initialTimers, initialRepetitions } = params;
 
   const [name, setName] = useState((initialName as string) || '');
-  const [timers, setTimers] = useState<ITimerPicker[]>(
+  const [timers, setTimers] = useState<Timer[]>(
     JSON.parse(initialTimers as string) || [{ minutes: 0, seconds: 0 }]
   );
   const [repetitions, setRepetitions] = useState(

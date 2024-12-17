@@ -10,11 +10,12 @@ import { router } from 'expo-router';
 
 // Internal Dependencies
 import { BottomSheet } from '~/components/ui/bottom-sheet';
+import { Timer } from '~/lib/types';
 
 interface IntervalItemProps {
   id: string;
   title: string;
-  duration: string;
+  timers: Timer[];
   repetitions: number;
   onEdit: () => void;
   onDelete: () => void;
@@ -23,7 +24,7 @@ interface IntervalItemProps {
 export function IntervalItem({
   id,
   title,
-  duration,
+  timers,
   repetitions,
   onEdit,
   onDelete,
@@ -47,7 +48,12 @@ export function IntervalItem({
                 <Text className="text-foreground text-md">x{repetitions}</Text>
               </Pressable>
             </View>
-            <Text className="text-foreground/60 text-lg">{duration}</Text>
+            {timers.map(({ minutes, seconds }, index) => (
+              <Text
+                key={`${minutes}:${seconds}:${index}`}
+                className="text-foreground/60 text-lg"
+              >{`${minutes}:${seconds.toString().padStart(2, '0')}`}</Text>
+            ))}
           </View>
 
           <Pressable
@@ -105,9 +111,7 @@ export function IntervalItem({
                 params: {
                   id: id,
                   initialName: title,
-                  initialTimers: JSON.stringify([
-                    { minutes: 0, seconds: parseInt(duration) },
-                  ]),
+                  initialTimers: JSON.stringify(timers),
                   initialRepetitions: repetitions.toString(),
                 },
               });
