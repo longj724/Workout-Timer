@@ -25,12 +25,12 @@ export default function Home() {
         { minutes: 0, seconds: 5, order: 0 },
         { minutes: 0, seconds: 2, order: 1 },
       ],
-      repetitions: 1,
+      repetitions: 2,
     },
     {
       id: '3',
       order: 2,
-      name: 'Rest',
+      name: 'Cool Down',
       timers: [{ minutes: 0, seconds: 5, order: 0 }],
       repetitions: 1,
     },
@@ -38,6 +38,21 @@ export default function Home() {
 
   const openNewIntervalModal = () => {
     router.push('/(modals)/AddInterval');
+  };
+
+  const calculateTotalTime = () => {
+    let totalSeconds = intervals.reduce((acc, { timers, repetitions }) => {
+      const intervalSeconds = timers.reduce(
+        (timerAcc, { minutes, seconds }) => timerAcc + minutes * 60 + seconds,
+        0
+      );
+      return acc + intervalSeconds * repetitions;
+    }, 0);
+
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${minutes}m ${seconds}s`;
   };
 
   return (
@@ -62,7 +77,7 @@ export default function Home() {
       </Pressable>
 
       <Pressable
-        className="bg-primary rounded-lg p-4 mt-auto"
+        className="bg-primary rounded-lg p-4 mt-auto flex-row justify-between"
         onPress={() =>
           router.push({
             pathname: '/PlayWorkout',
@@ -70,12 +85,12 @@ export default function Home() {
           })
         }
       >
-        <View className="flex-row items-center justify-center">
-          <Text className="text-primary-foreground text-xl mr-2">▶</Text>
-          <Text className="text-primary-foreground text-xl font-semibold">
-            Start
-          </Text>
-        </View>
+        <Text className="text-primary-foreground text-xl font-semibold">
+          Start Workout
+        </Text>
+        <Text className="text-primary-foreground text-xl font-semibold mr-2">
+          {calculateTotalTime()}
+        </Text>
       </Pressable>
     </View>
   );
