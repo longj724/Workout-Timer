@@ -1,16 +1,35 @@
+// External Dependencies
 import { View } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+
+// Internal Dependencies
 import { Text } from '~/components/ui/text';
 import { Button } from '~/components/ui/button';
+import { useCreateWorkout } from '~/hooks/useCreateWorkout';
 
 const WorkoutComplete = () => {
-  const { stats } = useLocalSearchParams<{ stats: string }>();
+  const { stats, workout } = useLocalSearchParams<{
+    stats: string;
+    workout: string;
+  }>();
   const workoutStats = JSON.parse(stats || '{}');
+  const workoutData = JSON.parse(workout || '{}');
+  const createWorkoutMutation = useCreateWorkout();
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const handleSaveWorkout = () => {
+    createWorkoutMutation.mutate({
+      name: `${
+        workoutData.name || 'Workout'
+      } - ${new Date().toLocaleDateString()}`,
+      intervals: workoutData.intervals,
+      userId: '1',
+    });
   };
 
   return (
@@ -34,9 +53,20 @@ const WorkoutComplete = () => {
         </View>
       </View>
 
-      <Button onPress={() => router.push('/')} style={{ marginTop: 20 }}>
-        <Text>Back to Home</Text>
-      </Button>
+      <View style={{ gap: 12, marginTop: 20 }}>
+        <Button
+          onPress={handleSaveWorkout}
+          disabled={createWorkoutMutation.isPending}
+        >
+          <Text>
+            {createWorkoutMutation.isPending ? 'Saving...' : 'Save Workout'}
+          </Text>
+        </Button>
+
+        <Button onPress={() => router.push('/')}>
+          <Text>Back to Home</Text>
+        </Button>
+      </View>
     </View>
   );
 };

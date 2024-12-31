@@ -14,7 +14,7 @@ import { Timer } from '~/lib/types';
 
 interface IntervalItemProps {
   id: string;
-  title: string;
+  name?: string;
   timers: Timer[];
   repetitions: number;
   onEdit: () => void;
@@ -23,7 +23,7 @@ interface IntervalItemProps {
 
 export function IntervalItem({
   id,
-  title,
+  name,
   timers,
   repetitions,
   onEdit,
@@ -39,7 +39,7 @@ export function IntervalItem({
           <View className="flex-col">
             <View className="flex-row items-center gap-2">
               <Text className="text-foreground text-lg font-semibold">
-                {title}
+                {name}
               </Text>
               <Pressable
                 className="bg-muted px-4 py-2 rounded-md"
@@ -110,7 +110,7 @@ export function IntervalItem({
                 pathname: '/(modals)/EditInterval',
                 params: {
                   id: id,
-                  initialName: title,
+                  initialName: name,
                   initialTimers: JSON.stringify(timers),
                   initialRepetitions: repetitions.toString(),
                 },

@@ -1,15 +1,8 @@
 // External Dependencies
 import { Tabs } from 'expo-router';
-import {
-  CalendarDays,
-  Dumbbell,
-  Plus,
-  Settings,
-  Timer,
-} from 'lucide-react-native';
-import MyWorkouts from './MyWorkouts'; // Ensure this path is correct
+import { CalendarDays, Dumbbell, Settings, Timer } from 'lucide-react-native';
 
-import React from 'react';
+// Internal Dependencies
 
 export default function TabLayout() {
   return (
@@ -37,7 +30,7 @@ export default function TabLayout() {
         name="History"
         options={{
           title: 'History',
-          tabBarIcon: ({ color }) => <CalendarDays size={24} color={color} />, // You can change the icon as needed
+          tabBarIcon: ({ color }) => <CalendarDays size={24} color={color} />,
         }}
       />
       <Tabs.Screen

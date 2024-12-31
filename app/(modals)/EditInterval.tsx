@@ -47,7 +47,7 @@ const EditInterval = () => {
   const [currentEditingIndex, setCurrentEditingIndex] = useState<number>(0);
 
   const handleAddTimer = () => {
-    setTimers([...timers, { minutes: 0, seconds: 0 }]);
+    setTimers([...timers, { minutes: 0, seconds: 0, order: timers.length }]);
   };
 
   const handleRemoveTimer = (index: number) => {
@@ -138,7 +138,10 @@ const EditInterval = () => {
           setIsVisible={setShowTimerPicker}
           onConfirm={(pickedDuration) => {
             const updatedTimers = [...timers];
-            updatedTimers[currentEditingIndex] = pickedDuration;
+            updatedTimers[currentEditingIndex] = {
+              ...pickedDuration,
+              order: timers.length,
+            };
             setTimers(updatedTimers);
             setShowTimerPicker(false);
           }}

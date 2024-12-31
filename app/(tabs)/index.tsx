@@ -12,23 +12,26 @@ export default function Home() {
   const [intervals, setIntervals] = useState<Interval[]>([
     {
       id: '1',
-      title: 'Warm Up',
-      timers: [{ minutes: 0, seconds: 2 }],
+      name: 'Warm Up',
+      timers: [{ minutes: 0, seconds: 2, order: 0 }],
       repetitions: 1,
+      order: 0,
     },
     {
       id: '2',
-      title: 'High Intensity',
+      order: 1,
+      name: 'High Intensity',
       timers: [
-        { minutes: 0, seconds: 5 },
-        { minutes: 0, seconds: 2 },
+        { minutes: 0, seconds: 5, order: 0 },
+        { minutes: 0, seconds: 2, order: 1 },
       ],
       repetitions: 1,
     },
     {
       id: '3',
-      title: 'Rest',
-      timers: [{ minutes: 0, seconds: 5 }],
+      order: 2,
+      name: 'Rest',
+      timers: [{ minutes: 0, seconds: 5, order: 0 }],
       repetitions: 1,
     },
   ]);

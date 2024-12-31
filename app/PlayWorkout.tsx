@@ -101,6 +101,7 @@ const PlayWorkout = () => {
                   0
                 ),
               }),
+              workout: JSON.stringify(intervals),
             },
           });
         }
