@@ -9,7 +9,7 @@ import { router } from 'expo-router';
 // Internal Dependencies
 import { Interval, Timer } from '~/lib/types';
 import { Text } from '~/components/ui/text';
-import { Button } from '~/components/ui/button';
+import { Card } from '~/components/ui/card';
 
 const PlayWorkout = () => {
   const { intervalInfo } = useLocalSearchParams<{ intervalInfo: string }>();
@@ -25,11 +25,6 @@ const PlayWorkout = () => {
   const [curTimerTotalSeconds, setCurTimerTotalSeconds] = useState(0);
   const [curRepetition, setCurRepetition] = useState(1);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [workoutStats, setWorkoutStats] = useState({
-    totalTime: 0,
-    completedIntervals: 0,
-    completedTimers: 0,
-  });
 
   useEffect(() => {
     setCurTimers(intervals[currentIntervalIndex].timers);
@@ -130,36 +125,30 @@ const PlayWorkout = () => {
   const formatTime = (remainingTime: number) => {
     const minutes = Math.floor(remainingTime / 60);
     const seconds = remainingTime % 60;
-    return <Text>{`${minutes}:${seconds.toString().padStart(2, '0')}`}</Text>;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
   return (
     <View
       style={{
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 20,
+        backgroundColor: '#FF7F50', // Coral color similar to the image
+        padding: 20,
       }}
     >
-      <View style={{ alignItems: 'center', gap: 8 }}>
-        <Text>
-          Interval {currentIntervalIndex + 1} of {intervals.length}
-        </Text>
-        <Text>
-          Timer {curTimerIndex + 1} of {curTimers.length}
-        </Text>
-        <Text>
-          {curTimers[curTimerIndex]?.minutes}:
-          {curTimers[curTimerIndex]?.seconds.toString().padStart(2, '0')}
-        </Text>
-        <Text>
-          Repetition {curRepetition} of{' '}
-          {intervals[currentIntervalIndex]?.repetitions}
-        </Text>
-      </View>
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          right: 20,
+          top: 50,
+          zIndex: 1,
+        }}
+        onPress={() => router.back()}
+      >
+        <AntDesign name="close" size={28} color="#fff" />
+      </TouchableOpacity>
 
-      <View style={{ alignItems: 'center', gap: 16 }}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <CountdownCircleTimer
           key={key}
           isPlaying={isPlaying}
@@ -171,35 +160,100 @@ const PlayWorkout = () => {
             curTimerTotalSeconds * 0.3,
             0,
           ]}
+          size={280}
+          strokeWidth={20}
+          trailColor="rgba(255,255,255,0.3)"
           onComplete={handleComplete}
         >
-          {({ remainingTime }) => formatTime(remainingTime)}
+          {({ remainingTime }) => (
+            <View className="flex items-center">
+              <Text className="text-2xl text-white font-bold">
+                {formatTime(remainingTime)}
+              </Text>
+            </View>
+          )}
         </CountdownCircleTimer>
 
-        <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-          <TouchableOpacity onPress={handlePlayPause}>
+        <Card
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            borderRadius: 20,
+          }}
+          className="h-32 flex flex-row justify-between items-center px-4 w-full mt-6"
+        >
+          <View className="w-full flex flex-row items-center justify-between">
+            <View className="flex items-center">
+              {/* Intervals */}
+              <Text className="text-2xl text-white font-bold">
+                {`${currentIntervalIndex + 1} / ${intervals.length}`}
+              </Text>
+              <Text className="text-md text-white font-semibold">
+                INTERVALS
+              </Text>
+            </View>
+
+            {/* Remaining */}
+            <View className="flex items-center">
+              <Text className="text-2xl text-white font-bold">
+                {`${Math.floor(curTimerTotalSeconds / 60)}:${String(
+                  curTimerTotalSeconds % 60
+                ).padStart(2, '0')}`}
+              </Text>
+              <Text className="text-md text-white font-semibold">
+                REMAINING
+              </Text>
+            </View>
+
+            {/* Rounds */}
+            <View className="flex items-center">
+              <Text className="text-2xl text-white font-bold">
+                {`${curRepetition} / ${intervals[currentIntervalIndex].repetitions}`}
+              </Text>
+              <Text className="text-md text-white font-semibold">ROUNDS</Text>
+            </View>
+          </View>
+        </Card>
+
+        <View className="flex flex-row justify-between mt-16 px-5 items-center gap-4">
+          <TouchableOpacity
+            onPress={handleNextTimer}
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.2)',
+              borderRadius: 15,
+            }}
+            className="flex flex-col items-center justify-center w-28 h-28 py-2"
+          >
+            <AntDesign name="stepforward" size={28} color="#fff" />
+            <Text className="text-md text-white font-semibold">NEXT</Text>
+            <Text className="text-md text-white font-semibold">TIMER</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handlePlayPause}
+            style={{
+              borderRadius: 15,
+            }}
+            className="flex w-28 py-2 h-28 items-center justify-center bg-white"
+          >
             <AntDesign
-              name={isPlaying ? 'pausecircle' : 'playcircleo'}
+              name={isPlaying ? 'pause' : 'caretright'}
               size={28}
-              color="#000"
+              color="#FF7F50"
             />
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={handleNextTimer}
-            disabled={curTimerIndex >= curTimers.length - 1}
-            style={{ opacity: curTimerIndex >= curTimers.length - 1 ? 0.5 : 1 }}
-          >
-            <AntDesign name="stepforward" size={28} color="#000" />
-          </TouchableOpacity>
-
-          <Button
             onPress={handleNext}
-            disabled={currentIntervalIndex === intervals.length - 1}
-            style={{ paddingHorizontal: 20 }}
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.2)',
+              borderRadius: 15,
+            }}
+            className="flex flex-col items-center justify-center py-2 w-28 h-28"
           >
-            <Text>Next Interval</Text>
-          </Button>
+            <AntDesign name="forward" size={28} color="#fff" />
+            <Text className="text-md text-white font-semibold">NEXT</Text>
+            <Text className="text-md text-white font-semibold">INTERVAL</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

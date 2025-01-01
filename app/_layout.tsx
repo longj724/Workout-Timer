@@ -133,11 +133,12 @@ function RootLayoutNav() {
         name="PlayWorkout"
         options={{
           title: 'Play Workout',
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text>Cancel</Text>
-            </TouchableOpacity>
-          ),
+          headerShown: false,
+          // headerLeft: () => (
+          //   <TouchableOpacity onPress={() => router.back()}>
+          //     <Text>Cancel</Text>
+          //   </TouchableOpacity>
+          // ),
         }}
       />
       <Stack.Screen
