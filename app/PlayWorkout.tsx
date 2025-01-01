@@ -1,5 +1,5 @@
 // External Dependencies
-import { TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View, Alert } from 'react-native';
 import { useState, useCallback, useEffect } from 'react';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { useLocalSearchParams } from 'expo-router';
@@ -128,6 +128,22 @@ const PlayWorkout = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const handleClose = () => {
+    handlePlayPause();
+    Alert.alert('Quit Workout', 'Are you sure you want to quit this workout?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+        onPress: () => handlePlayPause(),
+      },
+      {
+        text: 'Quit',
+        onPress: () => router.back(),
+        style: 'destructive',
+      },
+    ]);
+  };
+
   return (
     <View
       style={{
@@ -138,12 +154,11 @@ const PlayWorkout = () => {
     >
       <TouchableOpacity
         style={{
-          position: 'absolute',
           right: 20,
           top: 50,
-          zIndex: 1,
         }}
-        onPress={() => router.back()}
+        className="z-10 absolute"
+        onPress={handleClose}
       >
         <AntDesign name="close" size={28} color="#fff" />
       </TouchableOpacity>
