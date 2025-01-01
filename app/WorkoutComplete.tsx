@@ -2,6 +2,7 @@
 import { View } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Timer, BarChart, Repeat, PartyPopper } from 'lucide-react-native';
+import { SignedIn } from '@clerk/clerk-expo';
 
 // Internal Dependencies
 import { Text } from '~/components/ui/text';
@@ -50,22 +51,36 @@ const WorkoutComplete = () => {
                 <View className="flex flex-row items-center justify-center gap-4 p-4 rounded-lg bg-muted">
                   <Timer className="w-6 h-6 text-primary" />
                   <Text>Total Time</Text>
-                  <Text className="text-2xl font-semibold">0:14</Text>
+                  <Text className="text-2xl font-semibold">
+                    {formatTime(workoutStats.totalTime)}
+                  </Text>
                 </View>
 
                 <View className="flex flex-row items-center justify-center gap-4 p-4 rounded-lg bg-muted">
                   <BarChart className="w-6 h-6 text-primary" />
                   <Text>Intervals Completed</Text>
-                  <Text className="text-2xl font-semibold">3</Text>
+                  <Text className="text-2xl font-semibold">
+                    {workoutStats.totalIntervals}
+                  </Text>
+                </View>
+
+                <View className="flex flex-row items-center justify-center gap-4 p-4 rounded-lg bg-muted">
+                  <Repeat className="w-6 h-6 text-primary" />
+                  <Text>Total Repetitions</Text>
+                  <Text className="text-2xl font-semibold">
+                    {workoutStats.totalRepetitions}
+                  </Text>
                 </View>
               </View>
             </View>
           </CardContent>
 
           <CardFooter className="flex flex-col gap-2 p-6">
-            <Button className="w-full" size="lg">
-              <Text>Save Workout</Text>
-            </Button>
+            <SignedIn>
+              <Button className="w-full" size="lg" onPress={handleSaveWorkout}>
+                <Text>Save Workout</Text>
+              </Button>
+            </SignedIn>
             <Button
               variant="outline"
               className="w-full"
