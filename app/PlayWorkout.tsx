@@ -1,6 +1,6 @@
 // External Dependencies
 import { TouchableOpacity, View, Alert } from 'react-native';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { useLocalSearchParams } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
@@ -25,6 +25,8 @@ const PlayWorkout = () => {
   const [curTimerTotalSeconds, setCurTimerTotalSeconds] = useState(0);
   const [curRepetition, setCurRepetition] = useState(1);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [totalRemainingSeconds, setTotalRemainingSeconds] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setCurTimers(intervals[currentIntervalIndex].timers);
@@ -53,6 +55,28 @@ const PlayWorkout = () => {
         intervals[currentIntervalIndex].timers[0].seconds
     );
   }, [currentIntervalIndex]);
+
+  useEffect(() => {
+    // Initialize total time
+    setTotalRemainingSeconds(calculateInitialTotalTime());
+
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    if (isPlaying) {
+      intervalRef.current = setInterval(() => {
+        setTotalRemainingSeconds((prev) => Math.max(0, prev - 1));
+      }, 1000);
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isPlaying, currentIntervalIndex, curRepetition]);
 
   const handleComplete = () => {
     // If there is another timer in the current interval
@@ -144,6 +168,33 @@ const PlayWorkout = () => {
     ]);
   };
 
+  const calculateInitialTotalTime = () => {
+    return intervals.reduce((acc, interval, intervalIndex) => {
+      const intervalSeconds = interval.timers.reduce(
+        (timerAcc, timer) => timerAcc + timer.minutes * 60 + timer.seconds,
+        0
+      );
+
+      // If we're past this interval, return acc
+      if (intervalIndex < currentIntervalIndex) return acc;
+
+      // If this is the current interval, only count remaining repetitions
+      if (intervalIndex === currentIntervalIndex) {
+        const remainingReps = interval.repetitions - curRepetition + 1;
+        return acc + intervalSeconds * remainingReps;
+      }
+
+      // For future intervals, count all repetitions
+      return acc + intervalSeconds * interval.repetitions;
+    }, 0);
+  };
+
+  const formatTotalTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
   return (
     <View
       style={{
@@ -210,9 +261,7 @@ const PlayWorkout = () => {
             {/* Remaining */}
             <View className="flex items-center">
               <Text className="text-2xl text-white font-bold">
-                {`${Math.floor(curTimerTotalSeconds / 60)}:${String(
-                  curTimerTotalSeconds % 60
-                ).padStart(2, '0')}`}
+                {formatTotalTime(totalRemainingSeconds)}
               </Text>
               <Text className="text-md text-white font-semibold">
                 REMAINING
