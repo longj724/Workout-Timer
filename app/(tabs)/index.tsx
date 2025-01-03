@@ -2,39 +2,37 @@
 import { View, Text, Pressable } from 'react-native';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 // Internal Dependencies
 import { IntervalItem } from '~/components/ui/IntervalItem';
 import { Interval } from '~/lib/types';
+import { useAsyncStorage } from '~/hooks/useStorage';
+
+const defaultIntervals: Interval[] = [
+  {
+    id: uuidv4(),
+    name: 'Warm Up',
+    timers: [{ minutes: 0, seconds: 5, order: 0 }],
+    repetitions: 1,
+    order: 0,
+  },
+  {
+    id: uuidv4(),
+    name: 'High Intensity',
+    timers: [{ minutes: 0, seconds: 5, order: 0 }],
+    repetitions: 2,
+    order: 1,
+  },
+];
 
 export default function Home() {
   const router = useRouter();
-  const [intervals, setIntervals] = useState<Interval[]>([
-    {
-      id: '1',
-      name: 'Warm Up',
-      timers: [{ minutes: 0, seconds: 2, order: 0 }],
-      repetitions: 1,
-      order: 0,
-    },
-    {
-      id: '2',
-      order: 1,
-      name: 'High Intensity',
-      timers: [
-        { minutes: 0, seconds: 5, order: 0 },
-        { minutes: 0, seconds: 2, order: 1 },
-      ],
-      repetitions: 2,
-    },
-    {
-      id: '3',
-      order: 2,
-      name: 'Cool Down',
-      timers: [{ minutes: 0, seconds: 5, order: 0 }],
-      repetitions: 1,
-    },
-  ]);
+  const [intervals, setIntervals] = useAsyncStorage<Interval[]>(
+    'intervals',
+    defaultIntervals
+  );
 
   const openNewIntervalModal = () => {
     router.push('/(modals)/AddInterval');
