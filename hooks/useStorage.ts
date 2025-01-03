@@ -2,6 +2,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 
 type StorageValue = string | number | boolean | object | null;
 
@@ -118,4 +119,118 @@ export function useAsyncStorageBoolean(
 ): PersistentStorage<boolean> {
   const [value, setValue, loading] = useAsyncStorage(key, initialValue);
   return { value, setValue, loading };
+}
+
+type StorageMutationArgs<T> = {
+  key: string;
+  value: T;
+};
+
+async function setStorageItem<T extends StorageValue>({
+  key,
+  value,
+}: StorageMutationArgs<T>) {
+  if (value === null) {
+    await AsyncStorage.removeItem(key);
+    return null;
+  }
+
+  const jsonValue =
+    typeof value === 'object' ? JSON.stringify(value) : String(value);
+
+  await AsyncStorage.setItem(key, jsonValue);
+  return value;
+}
+
+export function useStorageMutation<T extends StorageValue>(key: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (value: T) => setStorageItem({ key, value }),
+    onSuccess: (data) => {
+      // Invalidate and refetch any queries that depend on this storage key
+      queryClient.invalidateQueries({ queryKey: [key] });
+    },
+    onError: (error) => {
+      console.error(`Error storing value for key "${key}":`, error);
+    },
+  });
+}
+
+// Example typed versions of the mutation hook
+export function useStorageStringMutation(key: string) {
+  return useStorageMutation<string>(key);
+}
+
+export function useStorageNumberMutation(key: string) {
+  return useStorageMutation<number>(key);
+}
+
+export function useStorageBooleanMutation(key: string) {
+  return useStorageMutation<boolean>(key);
+}
+
+async function getStorageItem<T extends StorageValue>(
+  key: string,
+  defaultValue: T
+): Promise<T> {
+  try {
+    const jsonValue = await AsyncStorage.getItem(key);
+
+    if (jsonValue === null) {
+      return defaultValue;
+    }
+
+    // Parse value based on default value type
+    if (typeof defaultValue === 'object') {
+      return JSON.parse(jsonValue);
+    } else if (typeof defaultValue === 'number') {
+      return Number(jsonValue) as T;
+    } else if (typeof defaultValue === 'boolean') {
+      return (jsonValue === 'true') as T;
+    }
+    return jsonValue as T;
+  } catch (error) {
+    console.error(`Error reading storage key "${key}":`, error);
+    return defaultValue;
+  }
+}
+
+export function useStorageQuery<T extends StorageValue>(
+  key: string,
+  defaultValue: T,
+  options?: {
+    enabled?: boolean;
+  }
+) {
+  return useQuery({
+    queryKey: [key],
+    queryFn: () => getStorageItem<T>(key, defaultValue),
+    ...options,
+  });
+}
+
+// Typed versions for common data types
+export function useStorageStringQuery(
+  key: string,
+  defaultValue: string = '',
+  options?: { enabled?: boolean }
+) {
+  return useStorageQuery(key, defaultValue, options);
+}
+
+export function useStorageNumberQuery(
+  key: string,
+  defaultValue: number = 0,
+  options?: { enabled?: boolean }
+) {
+  return useStorageQuery(key, defaultValue, options);
+}
+
+export function useStorageBooleanQuery(
+  key: string,
+  defaultValue: boolean = false,
+  options?: { enabled?: boolean }
+) {
+  return useStorageQuery(key, defaultValue, options);
 }

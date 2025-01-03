@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 // Internal Dependencies
 import { IntervalItem } from '~/components/ui/IntervalItem';
 import { Interval } from '~/lib/types';
-import { useAsyncStorage } from '~/hooks/useStorage';
+import { useAsyncStorage, useStorageQuery } from '~/hooks/useStorage';
 
 const defaultIntervals: Interval[] = [
   {
@@ -29,7 +29,7 @@ const defaultIntervals: Interval[] = [
 
 export default function Home() {
   const router = useRouter();
-  const [intervals, setIntervals] = useAsyncStorage<Interval[]>(
+  const { data: intervals } = useStorageQuery<Interval[]>(
     'intervals',
     defaultIntervals
   );
@@ -39,6 +39,8 @@ export default function Home() {
   };
 
   const calculateTotalTime = () => {
+    if (!intervals) return '0m 0s';
+
     let totalSeconds = intervals.reduce((acc, { timers, repetitions }) => {
       const intervalSeconds = timers.reduce(
         (timerAcc, { minutes, seconds }) => timerAcc + minutes * 60 + seconds,
@@ -57,7 +59,7 @@ export default function Home() {
     <View className="flex-1 bg-background p-4">
       <Text className="text-foreground text-2xl font-bold mb-4">Workout</Text>
 
-      {intervals.map((interval) => (
+      {intervals?.map((interval) => (
         <IntervalItem
           key={interval.id}
           {...interval}

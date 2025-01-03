@@ -1,5 +1,5 @@
 // External Dependencies
-import { ScrollView, View } from 'react-native';
+import { PlatformColor, ScrollView, View } from 'react-native';
 import { useState } from 'react';
 import { z } from 'zod';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -8,22 +8,22 @@ import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
 import { TimerPickerModal } from 'react-native-timer-picker';
 import { Trash2 } from 'lucide-react-native';
-import { PlatformColor } from 'react-native';
 
 // Internal Dependencies
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
-import { Timer } from '~/lib/types';
+import { Interval, Timer } from '~/lib/types';
+import { useStorageMutation, useStorageQuery } from '~/hooks/useStorage';
 
 const intervalSchema = z.object({
   name: z.string().optional(),
   timers: z
     .array(
       z.object({
-        hours: z.number().optional(),
-        minutes: z.number().optional(),
-        seconds: z.number().optional(),
+        minutes: z.number(),
+        seconds: z.number(),
+        order: z.number(),
       })
     )
     .min(1, 'At least one timer is required'),
@@ -33,6 +33,11 @@ const intervalSchema = z.object({
 type IntervalForm = z.infer<typeof intervalSchema>;
 
 const EditInterval = () => {
+  const { data: intervals, isLoading } = useStorageQuery<Interval[]>(
+    'intervals',
+    []
+  );
+  const { mutate: setIntervals } = useStorageMutation<Interval[]>('intervals');
   const params = useLocalSearchParams();
   const { id, initialName, initialTimers, initialRepetitions } = params;
 
@@ -65,7 +70,17 @@ const EditInterval = () => {
       };
 
       const validated = intervalSchema.parse(formData);
-      // Here you would update the interval with the new data
+
+      const updatedIntervals = intervals?.map((interval) => {
+        if (interval.id === id) {
+          return { ...interval, ...validated };
+        }
+        return interval;
+      });
+
+      if (updatedIntervals) {
+        setIntervals(updatedIntervals);
+      }
 
       router.back();
     } catch (error) {
