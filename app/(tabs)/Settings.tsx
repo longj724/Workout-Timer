@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   PlatformColor,
   Pressable,
+  Image,
 } from 'react-native';
 import {
   ChevronRight,
@@ -16,24 +17,29 @@ import {
   Store,
   Volume2,
   Mic,
-  Vibrate,
   ArrowLeft,
   Clock,
   Check,
+  User,
+  LogOut,
 } from 'lucide-react-native';
 import { TimerPickerModal } from 'react-native-timer-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
+import { useClerk, useUser } from '@clerk/clerk-expo';
 
 // Internal Dependencies
 import { Text } from '~/components/ui/text';
 import { Switch } from '~/components/ui/switch';
 
-type SettingsView = 'main' | 'audio' | 'voice';
+type SettingsView = 'main' | 'audio' | 'voice' | 'profile';
 type SoundType = 'none' | 'voice' | 'beeps';
 
 export default function SettingsScreen() {
+  const { user } = useUser();
+  const { signOut } = useClerk();
+
   const [currentView, setCurrentView] = useState<SettingsView>('main');
 
   // Audio Settings State
@@ -43,7 +49,7 @@ export default function SettingsScreen() {
     useState(false);
   const [soundType, setSoundType] = useState<SoundType>('beeps');
 
-  // Voice Settings State
+  // Voice Assistant Settings
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [timeAnnouncements, setTimeAnnouncements] = useState(true);
 
@@ -225,10 +231,103 @@ export default function SettingsScreen() {
     );
   }
 
+  if (currentView === 'profile') {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50">
+        {renderHeader('Profile', 'Manage your account')}
+        <ScrollView>
+          {/* Profile Info */}
+          <View className="mx-4 bg-white rounded-lg shadow mb-4">
+            <View className="p-6 items-center border-b border-gray-200">
+              <View className="h-24 w-24 rounded-full bg-gray-200 items-center justify-center overflow-hidden mb-4">
+                {user?.imageUrl ? (
+                  <Image
+                    source={{ uri: user.imageUrl }}
+                    className="h-full w-full"
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <User size={40} color="#9CA3AF" />
+                )}
+              </View>
+              <Text className="text-xl font-medium">
+                {user?.fullName || user?.firstName || 'User'}
+              </Text>
+              <Text className="text-gray-500 mt-1">
+                {user?.emailAddresses[0].emailAddress}
+              </Text>
+            </View>
+
+            {/* Account Details */}
+            <View className="divide-y divide-gray-200">
+              <View className="p-4">
+                <Text className="text-sm text-gray-500 mb-1">Created</Text>
+                <Text className="text-base">
+                  {new Date(user?.createdAt || '').toLocaleDateString()}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Account Actions */}
+          <View className="mx-4 bg-white rounded-lg shadow divide-y divide-gray-200">
+            <TouchableOpacity
+              className="p-4 flex-row items-center"
+              onPress={async () => {
+                try {
+                  signOut();
+                  setCurrentView('main');
+                } catch (error) {
+                  console.error('Error signing out:', error);
+                }
+              }}
+            >
+              <View className="h-10 w-10 rounded-xl bg-red-100 items-center justify-center">
+                <LogOut size={24} color="#DC2626" />
+              </View>
+              <Text className="flex-1 ml-4 text-lg text-red-600">Sign Out</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
   // Main Settings View
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView className="flex-1">
+        {/* User Profile Section */}
+        {user && (
+          <View className="mx-4 mb-4 bg-white rounded-lg shadow mt-4">
+            <TouchableOpacity
+              className="p-4 flex-row items-center"
+              onPress={() => setCurrentView('profile')}
+            >
+              <View className="h-14 w-14 rounded-full bg-gray-200 items-center justify-center overflow-hidden">
+                {user.imageUrl ? (
+                  <Image
+                    source={{ uri: user.imageUrl }}
+                    className="h-full w-full"
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <User size={24} color="#9CA3AF" />
+                )}
+              </View>
+              <View className="ml-4 flex-1">
+                <Text className="text-lg font-medium">
+                  {user.fullName || user.firstName || 'User'}
+                </Text>
+                <Text className="text-gray-500">
+                  {user.emailAddresses[0].emailAddress}
+                </Text>
+              </View>
+              <ChevronRight size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Review & Membership */}
         <View className="mx-4 mb-4 bg-white rounded-lg shadow divide-y divide-gray-200 mt-4">
           <TouchableOpacity className="flex flex-row items-center p-4">
@@ -257,8 +356,8 @@ export default function SettingsScreen() {
               onPress: () => setCurrentView('audio'),
             },
             {
-              icon: Ruler,
-              title: 'Voice Assistance',
+              icon: User,
+              title: 'Voice Assistant',
               onPress: () => setCurrentView('voice'),
             },
             {
@@ -286,9 +385,7 @@ export default function SettingsScreen() {
                   ))}
                 </View>
               )}
-              {/* {item.status && (
-                <Text className="text-emerald-500 mr-2">{item.status}</Text>
-              )} */}
+
               <ChevronRight size={20} color="#9CA3AF" />
             </TouchableOpacity>
           ))}
