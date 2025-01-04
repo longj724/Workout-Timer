@@ -9,45 +9,48 @@ import * as Haptics from 'expo-haptics';
 import { TimerPickerModal } from 'react-native-timer-picker';
 import { Trash2 } from 'lucide-react-native';
 import { PlatformColor } from 'react-native';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 // Internal Dependencies
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
+import { useStorageMutation, useStorageQuery } from '~/hooks/useStorage';
+import { Interval, Timer } from '~/lib/types';
 
 const intervalSchema = z.object({
   name: z.string().optional(),
   timers: z
     .array(
       z.object({
-        hours: z.number().optional(),
-        minutes: z.number().optional(),
-        seconds: z.number().optional(),
+        minutes: z.number(),
+        seconds: z.number(),
+        order: z.number(),
       })
     )
     .min(1, 'At least one timer is required'),
   repetitions: z.number().min(1, 'Must have at least 1 repetition'),
+  order: z.number(),
+  id: z.string(),
 });
 
 type IntervalForm = z.infer<typeof intervalSchema>;
 
-type ITimerPicker = {
-  hours?: number;
-  minutes?: number;
-  seconds?: number;
-};
-
 const AddInterval = () => {
+  const { data: intervals } = useStorageQuery<Interval[]>('intervals', []);
+  const { mutate: setIntervals } = useStorageMutation<Interval[]>('intervals');
+
   const [name, setName] = useState('');
-  const [timers, setTimers] = useState<ITimerPicker[]>([
-    { minutes: 0, seconds: 0 },
+  const [timers, setTimers] = useState<Timer[]>([
+    { minutes: 0, seconds: 0, order: 0 },
   ]);
   const [repetitions, setRepetitions] = useState('1');
   const [showTimerPicker, setShowTimerPicker] = useState(false);
   const [currentEditingIndex, setCurrentEditingIndex] = useState<number>(0);
 
   const handleAddTimer = () => {
-    setTimers([...timers, { minutes: 0, seconds: 0 }]);
+    setTimers([...timers, { minutes: 0, seconds: 0, order: timers.length }]);
   };
 
   const handleRemoveTimer = (index: number) => {
@@ -62,9 +65,15 @@ const AddInterval = () => {
         name,
         timers,
         repetitions: parseInt(repetitions),
+        order: intervals?.length || 0,
+        id: uuidv4(),
       };
 
       const validated = intervalSchema.parse(formData);
+
+      if (intervals) {
+        setIntervals([...intervals, validated]);
+      }
 
       router.back();
     } catch (error) {
@@ -156,8 +165,13 @@ const AddInterval = () => {
           visible={showTimerPicker}
           setIsVisible={setShowTimerPicker}
           onConfirm={(pickedDuration) => {
+            const modifiedTimer = {
+              minutes: pickedDuration.minutes,
+              seconds: pickedDuration.seconds,
+              order: timers[currentEditingIndex].order,
+            };
             const updatedTimers = [...timers];
-            updatedTimers[currentEditingIndex] = pickedDuration;
+            updatedTimers[currentEditingIndex] = modifiedTimer;
             setTimers(updatedTimers);
             setShowTimerPicker(false);
           }}

@@ -60,12 +60,7 @@ export default function Home() {
       <Text className="text-foreground text-2xl font-bold mb-4">Workout</Text>
 
       {intervals?.map((interval) => (
-        <IntervalItem
-          key={interval.id}
-          {...interval}
-          onEdit={() => {}}
-          onDelete={() => {}}
-        />
+        <IntervalItem key={interval.id} {...interval} />
       ))}
 
       <Pressable

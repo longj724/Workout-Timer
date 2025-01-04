@@ -89,38 +89,6 @@ export function useAsyncStorage<T extends StorageValue>(
   return [storedValue, setValue, loading];
 }
 
-// Utility types for common use cases
-export interface PersistentStorage<T> {
-  value: T;
-  setValue: Dispatch<SetStateAction<T>>;
-  loading: boolean;
-}
-
-// Specialized hooks for common data types
-export function useAsyncStorageString(
-  key: string,
-  initialValue: string = ''
-): PersistentStorage<string> {
-  const [value, setValue, loading] = useAsyncStorage(key, initialValue);
-  return { value, setValue, loading };
-}
-
-export function useAsyncStorageNumber(
-  key: string,
-  initialValue: number = 0
-): PersistentStorage<number> {
-  const [value, setValue, loading] = useAsyncStorage(key, initialValue);
-  return { value, setValue, loading };
-}
-
-export function useAsyncStorageBoolean(
-  key: string,
-  initialValue: boolean = false
-): PersistentStorage<boolean> {
-  const [value, setValue, loading] = useAsyncStorage(key, initialValue);
-  return { value, setValue, loading };
-}
-
 type StorageMutationArgs<T> = {
   key: string;
   value: T;
@@ -155,19 +123,6 @@ export function useStorageMutation<T extends StorageValue>(key: string) {
       console.error(`Error storing value for key "${key}":`, error);
     },
   });
-}
-
-// Example typed versions of the mutation hook
-export function useStorageStringMutation(key: string) {
-  return useStorageMutation<string>(key);
-}
-
-export function useStorageNumberMutation(key: string) {
-  return useStorageMutation<number>(key);
-}
-
-export function useStorageBooleanMutation(key: string) {
-  return useStorageMutation<boolean>(key);
 }
 
 async function getStorageItem<T extends StorageValue>(
@@ -208,29 +163,4 @@ export function useStorageQuery<T extends StorageValue>(
     queryFn: () => getStorageItem<T>(key, defaultValue),
     ...options,
   });
-}
-
-// Typed versions for common data types
-export function useStorageStringQuery(
-  key: string,
-  defaultValue: string = '',
-  options?: { enabled?: boolean }
-) {
-  return useStorageQuery(key, defaultValue, options);
-}
-
-export function useStorageNumberQuery(
-  key: string,
-  defaultValue: number = 0,
-  options?: { enabled?: boolean }
-) {
-  return useStorageQuery(key, defaultValue, options);
-}
-
-export function useStorageBooleanQuery(
-  key: string,
-  defaultValue: boolean = false,
-  options?: { enabled?: boolean }
-) {
-  return useStorageQuery(key, defaultValue, options);
 }

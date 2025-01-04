@@ -10,15 +10,14 @@ import { router } from 'expo-router';
 
 // Internal Dependencies
 import { BottomSheet } from '~/components/ui/bottom-sheet';
-import { Timer } from '~/lib/types';
+import { Interval, Timer } from '~/lib/types';
+import { useStorageMutation, useStorageQuery } from '~/hooks/useStorage';
 
 interface IntervalItemProps {
   id: string;
   name?: string;
   timers: Timer[];
   repetitions: number;
-  onEdit: () => void;
-  onDelete: () => void;
 }
 
 export function IntervalItem({
@@ -26,11 +25,21 @@ export function IntervalItem({
   name,
   timers,
   repetitions,
-  onEdit,
-  onDelete,
 }: IntervalItemProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTimerPickerOpen, setIsTimerPickerOpen] = useState(false);
+
+  const { data: intervals } = useStorageQuery<Interval[]>('intervals', []);
+  const { mutate: setIntervals } = useStorageMutation<Interval[]>('intervals');
+
+  const handleDeleteInterval = () => {
+    if (intervals) {
+      const updatedIntervals = intervals.filter(
+        (interval) => interval.id !== id
+      );
+      setIntervals(updatedIntervals);
+    }
+  };
 
   return (
     <>
@@ -124,7 +133,7 @@ export function IntervalItem({
 
           <Pressable
             onPress={() => {
-              onDelete();
+              handleDeleteInterval();
               setIsMenuOpen(false);
             }}
             className="flex-row items-center py-4"
