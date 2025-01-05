@@ -1,34 +1,32 @@
+// External Dependencies
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
-// import { ENV } from 'expo-env';
+import { useAuth } from '@clerk/clerk-expo';
 
-// Define the workout schema using zod
-const WorkoutSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string().nullable(),
-  created_at: z.string(),
-  updated_at: z.string(),
-  user_id: z.string(),
-});
-
-const WorkoutsResponseSchema = z.array(WorkoutSchema);
+// Internal Dependencies
+import { WorkoutsList } from '../lib/types';
 
 const API_URL = 'http://localhost:9999';
 
-type Workout = z.infer<typeof WorkoutSchema>;
-
-const fetchWorkouts = async (): Promise<Workout[]> => {
-  const response = await fetch(`${API_URL}/workouts`);
-  const data = await response.json();
-  return WorkoutsResponseSchema.parse(data);
-};
-
 export const useGetWorkouts = () => {
+  const { getToken } = useAuth();
+
   return useQuery({
     queryKey: ['workouts'],
-    queryFn: fetchWorkouts,
+    queryFn: async (): Promise<WorkoutsList> => {
+      const response = await fetch(`${API_URL}/workouts`, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch workouts');
+      }
+
+      const data = await response.json();
+      // Should parse the data with zod
+      return data;
+    },
   });
 };
-
-export type { Workout };

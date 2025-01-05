@@ -1,11 +1,16 @@
+// External Dependencies
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
+
+// Internal Dependencies
 import { CreateWorkoutInput, createWorkoutSchema } from '../lib/types';
+import { useAuth } from '@clerk/clerk-expo';
 
 const API_URL = 'http://localhost:9999';
 
 export const useCreateWorkout = () => {
   const queryClient = useQueryClient();
+  const { getToken } = useAuth();
 
   return useMutation({
     mutationFn: async (workout: CreateWorkoutInput) => {
@@ -15,6 +20,7 @@ export const useCreateWorkout = () => {
         const response = await fetch(`${API_URL}/workouts`, {
           method: 'POST',
           headers: {
+            Authorization: `Bearer ${await getToken()}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(validatedData),

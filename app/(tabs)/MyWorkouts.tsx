@@ -1,10 +1,12 @@
+// External Dependencies
 import { View } from 'react-native';
 import React from 'react';
 import { useOAuth } from '@clerk/clerk-expo';
+import { useUser } from '@clerk/clerk-expo';
 
+// Internal Dependencies
 import { Text } from '~/components/ui/text';
 import { Button } from '~/components/ui/button';
-import { useUser } from '@clerk/clerk-expo';
 import { useGetWorkouts } from '~/hooks/useGetWorkouts';
 
 export default function MyWorkouts() {
@@ -96,11 +98,6 @@ export default function MyWorkouts() {
         workouts?.map((workout) => (
           <View key={workout.id} className="bg-card rounded-lg p-4 mb-4">
             <Text className="text-lg font-semibold">{workout.name}</Text>
-            {workout.description && (
-              <Text className="text-muted-foreground mt-1">
-                {workout.description}
-              </Text>
-            )}
           </View>
         ))
       )}

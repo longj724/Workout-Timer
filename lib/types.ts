@@ -36,3 +36,36 @@ export const createWorkoutSchema = z.object({
 export type CreateTimerInput = z.infer<typeof createTimerSchema>;
 export type CreateIntervalInput = z.infer<typeof createIntervalSchema>;
 export type CreateWorkoutInput = z.infer<typeof createWorkoutSchema>;
+
+export const timerWithMetadataSchema = z.object({
+  id: z.string(),
+  intervalId: z.string(),
+  minutes: z.number().min(0).max(59),
+  seconds: z.number().min(0).max(59),
+  order: z.number().min(0),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export const intervalWithMetadataSchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  repetitions: z.number().min(1),
+  order: z.number().min(0),
+  workoutId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  timers: z.array(timerWithMetadataSchema),
+});
+
+export const workoutWithRelationsSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  userId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  intervals: z.array(intervalWithMetadataSchema),
+});
+
+export type WorkoutWithRelations = z.infer<typeof workoutWithRelationsSchema>;
+export type WorkoutsList = WorkoutWithRelations[];
