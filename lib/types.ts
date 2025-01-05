@@ -33,9 +33,14 @@ export const createWorkoutSchema = z.object({
   intervals: z.array(createIntervalSchema),
 });
 
+export const editIntervalSchema = createIntervalSchema.extend({
+  id: z.string(),
+});
+
 export type CreateTimerInput = z.infer<typeof createTimerSchema>;
 export type CreateIntervalInput = z.infer<typeof createIntervalSchema>;
 export type CreateWorkoutInput = z.infer<typeof createWorkoutSchema>;
+export type EditIntervalInput = z.infer<typeof editIntervalSchema>;
 
 export const timerWithMetadataSchema = z.object({
   id: z.string(),

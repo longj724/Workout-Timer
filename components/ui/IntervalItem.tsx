@@ -14,6 +14,7 @@ interface IntervalItemProps {
   name?: string;
   timers: Timer[];
   repetitions: number;
+  order: number;
 }
 
 export function IntervalItem({
@@ -21,6 +22,7 @@ export function IntervalItem({
   name,
   timers,
   repetitions,
+  order,
 }: IntervalItemProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -77,7 +79,8 @@ export function IntervalItem({
                   id: id,
                   initialName: name,
                   initialTimers: JSON.stringify(timers),
-                  initialRepetitions: repetitions.toString(),
+                  initialRepetitions: repetitions,
+                  order,
                 },
               });
             }}

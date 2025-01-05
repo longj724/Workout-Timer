@@ -15,31 +15,22 @@ import { Input } from '~/components/ui/input';
 import { Text } from '~/components/ui/text';
 import { Interval, Timer } from '~/lib/types';
 import { useStorageMutation, useStorageQuery } from '~/hooks/useStorage';
-
-const intervalSchema = z.object({
-  name: z.string().optional(),
-  timers: z
-    .array(
-      z.object({
-        minutes: z.number(),
-        seconds: z.number(),
-        order: z.number(),
-      })
-    )
-    .min(1, 'At least one timer is required'),
-  repetitions: z.number().min(1, 'Must have at least 1 repetition'),
-});
-
-type IntervalForm = z.infer<typeof intervalSchema>;
+import { useEditInterval } from '~/hooks/useEditInterval';
+import { EditIntervalInput, editIntervalSchema } from '~/lib/types';
 
 const EditInterval = () => {
-  const { data: intervals, isLoading } = useStorageQuery<Interval[]>(
-    'intervals',
-    []
-  );
+  const { data: intervals } = useStorageQuery<Interval[]>('intervals', []);
   const { mutate: setIntervals } = useStorageMutation<Interval[]>('intervals');
+  const { mutate: editInterval } = useEditInterval();
   const params = useLocalSearchParams();
-  const { id, initialName, initialTimers, initialRepetitions } = params;
+  const {
+    id,
+    initialName,
+    initialTimers,
+    initialRepetitions,
+    editingSavedInterval,
+    order,
+  } = params;
 
   const [name, setName] = useState((initialName as string) || '');
   const [timers, setTimers] = useState<Timer[]>(
@@ -62,30 +53,48 @@ const EditInterval = () => {
   };
 
   const handleSubmit = () => {
-    try {
-      const formData: IntervalForm = {
+    if (JSON.parse(editingSavedInterval as string) === true) {
+      const formData: EditIntervalInput = {
+        id: id as string,
         name,
         timers,
+        order: parseInt(order as string),
         repetitions: parseInt(repetitions),
       };
 
-      const validated = intervalSchema.parse(formData);
+      const validatedInterval = editIntervalSchema.parse(formData) as Interval;
 
-      const updatedIntervals = intervals?.map((interval) => {
-        if (interval.id === id) {
-          return { ...interval, ...validated };
-        }
-        return interval;
-      });
-
-      if (updatedIntervals) {
-        setIntervals(updatedIntervals);
-      }
+      editInterval(validatedInterval);
 
       router.back();
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        console.error('Validation error:', error.errors);
+    } else {
+      try {
+        const formData: EditIntervalInput = {
+          id: id as string,
+          name,
+          timers,
+          repetitions: parseInt(repetitions),
+          order: parseInt(order as string),
+        };
+
+        const validated = editIntervalSchema.parse(formData);
+
+        const updatedIntervals = intervals?.map((interval) => {
+          if (interval.id === id) {
+            return { ...interval, ...validated };
+          }
+          return interval;
+        });
+
+        if (updatedIntervals) {
+          setIntervals(updatedIntervals);
+        }
+
+        router.back();
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          console.error('Validation error:', error.errors);
+        }
       }
     }
   };

@@ -48,7 +48,7 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
   };
 
   const renderIntervals = () => {
-    return intervals.map(({ name, repetitions, timers }) => (
+    return intervals.map(({ name, repetitions, timers, order }) => (
       <View
         className="flex-row justify-between items-center"
         key={`${name}-${repetitions}-${timers.length}`}
@@ -79,6 +79,8 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
                 initialName: name,
                 initialTimers: JSON.stringify(timers),
                 initialRepetitions: repetitions.toString(),
+                editingSavedInterval: JSON.stringify(true),
+                order,
               },
             })
           }
@@ -123,7 +125,7 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
         </Pressable>
 
         {isExpanded && (
-          <View className="mt-2 flex-col gap-2">{renderIntervals()}</View>
+          <View className="mt-2 flex-col gap-2 pb-2">{renderIntervals()}</View>
         )}
       </View>
 
@@ -132,10 +134,10 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
           <Pressable
             onPress={() => {
               setIsMenuOpen(false);
-              // router.push({
-              //   pathname: '/WorkoutDetail',
-              //   params: { id: workout.id },
-              // });
+              router.push({
+                pathname: '/PlayWorkout',
+                params: { intervalInfo: JSON.stringify(intervals) },
+              });
             }}
             className="flex-row items-center py-4 border-b border-muted"
           >
