@@ -1,11 +1,7 @@
 // External Dependencies
-import { View, Text, Pressable, PlatformColor } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { TimerPickerModal } from 'react-native-timer-picker';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Audio } from 'expo-av';
-import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 
 // Internal Dependencies
@@ -27,7 +23,6 @@ export function IntervalItem({
   repetitions,
 }: IntervalItemProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isTimerPickerOpen, setIsTimerPickerOpen] = useState(false);
 
   const { data: intervals } = useStorageQuery<Interval[]>('intervals', []);
   const { mutate: setIntervals } = useStorageMutation<Interval[]>('intervals');
@@ -45,17 +40,14 @@ export function IntervalItem({
     <>
       <View className="bg-card rounded-lg p-4 mb-4 shadow-md shadow-foreground/10">
         <View className="flex-row justify-between items-center">
-          <View className="flex-col">
+          <View className="flex-col gap-1">
             <View className="flex-row items-center gap-2">
-              <Text className="text-foreground text-lg font-semibold">
-                {name}
-              </Text>
-              <Pressable
-                className="bg-muted px-4 py-2 rounded-md"
-                onPress={() => setIsTimerPickerOpen(true)}
-              >
-                <Text className="text-foreground text-md">x{repetitions}</Text>
-              </Pressable>
+              {name && (
+                <Text className="text-foreground text-lg font-semibold">
+                  {name} -
+                </Text>
+              )}
+              <Text className="text-foreground text-lg">x{repetitions}</Text>
             </View>
             {timers.map(({ minutes, seconds }, index) => (
               <Text
@@ -73,42 +65,6 @@ export function IntervalItem({
           </Pressable>
         </View>
       </View>
-
-      {isTimerPickerOpen && (
-        <TimerPickerModal
-          // Have to conform to timer props
-          initialValue={{ seconds: repetitions }}
-          visible={isTimerPickerOpen}
-          setIsVisible={setIsTimerPickerOpen}
-          onConfirm={(selectedRepetitions) => {
-            console.log(selectedRepetitions);
-          }}
-          confirmButtonText="Save"
-          secondLabel="x"
-          padMinutesWithZero={false}
-          padSecondsWithZero={false}
-          hideHours={true}
-          hideMinutes={true}
-          modalTitle="Repetitions"
-          onCancel={() => setIsTimerPickerOpen(false)}
-          closeOnOverlayPress
-          Audio={Audio}
-          LinearGradient={LinearGradient}
-          Haptics={Haptics}
-          styles={{
-            cancelButton: {
-              backgroundColor: PlatformColor('systemRed'),
-              color: 'white',
-              borderColor: PlatformColor('systemRed'),
-            },
-            confirmButton: {
-              backgroundColor: 'black',
-              color: 'white',
-              borderColor: 'black',
-            },
-          }}
-        />
-      )}
 
       <BottomSheet isVisible={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
         <View className="p-4 pb-8">
