@@ -16,13 +16,10 @@ interface WorkoutItemProps {
 
 export function WorkoutItem({ workout }: WorkoutItemProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const deleteWorkout = useDeleteWorkout();
 
-  const totalIntervals = workout.intervals.length;
-  const totalTimers = workout.intervals.reduce(
-    (acc, interval) => acc + interval.timers.length,
-    0
-  );
+  const { intervals, id } = workout;
 
   const handleDeleteWorkout = async () => {
     try {
@@ -33,19 +30,75 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
     }
   };
 
+  const calculateTotalTime = () => {
+    if (!intervals) return '0m 0s';
+
+    let totalSeconds = intervals.reduce((acc, { timers, repetitions }) => {
+      const intervalSeconds = timers.reduce(
+        (timerAcc, { minutes, seconds }) => timerAcc + minutes * 60 + seconds,
+        0
+      );
+      return acc + intervalSeconds * repetitions;
+    }, 0);
+
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${minutes}m ${seconds}s`;
+  };
+
+  const renderIntervals = () => {
+    return intervals.map(({ name, repetitions, timers }) => (
+      <View
+        className="flex-row justify-between items-center"
+        key={`${name}-${repetitions}-${timers.length}`}
+      >
+        <View className="flex-col gap-1">
+          <View className="flex-row items-center gap-2">
+            {name && (
+              <Text className="text-foreground text-lg font-semibold">
+                {name} -
+              </Text>
+            )}
+            <Text className="text-foreground text-lg">x{repetitions}</Text>
+          </View>
+          {timers.map(({ minutes, seconds }, index) => (
+            <Text
+              key={`${minutes}:${seconds}:${index}`}
+              className="text-foreground/60 text-lg"
+            >{`${minutes}:${seconds.toString().padStart(2, '0')}`}</Text>
+          ))}
+        </View>
+
+        <Pressable
+          onPress={() =>
+            router.push({
+              pathname: '/(modals)/EditInterval',
+              params: {
+                id,
+                initialName: name,
+                initialTimers: JSON.stringify(timers),
+                initialRepetitions: repetitions.toString(),
+              },
+            })
+          }
+          className="w-10 h-10 items-center justify-center"
+        >
+          <Ionicons name="pencil" size={18} color="#666" />
+        </Pressable>
+      </View>
+    ));
+  };
+
   return (
     <>
-      <View className="bg-card rounded-lg p-4 mb-4 shadow-md shadow-foreground/10">
+      <View className="bg-card rounded-lg px-4 pt-4 mb-4 shadow-md shadow-foreground/10">
         <View className="flex-row justify-between items-center">
           <View className="flex-col flex-1">
             <Text className="text-lg font-semibold">{workout.name}</Text>
             <View className="flex-row mt-2 gap-4">
               <Text className="text-muted-foreground">
-                {totalIntervals}{' '}
-                {totalIntervals === 1 ? 'interval' : 'intervals'}
-              </Text>
-              <Text className="text-muted-foreground">
-                {totalTimers} {totalTimers === 1 ? 'timer' : 'timers'}
+                Total Time: {calculateTotalTime()}
               </Text>
             </View>
           </View>
@@ -57,6 +110,21 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
             <Ionicons name="ellipsis-horizontal" size={24} color="#666" />
           </Pressable>
         </View>
+
+        <Pressable
+          onPress={() => setIsExpanded(!isExpanded)}
+          className="flex-row items-center justify-center mt-2 border-t border-muted py-2"
+        >
+          <Ionicons
+            name={isExpanded ? 'chevron-up' : 'chevron-down'}
+            size={24}
+            color="#666"
+          />
+        </Pressable>
+
+        {isExpanded && (
+          <View className="mt-2 flex-col gap-2">{renderIntervals()}</View>
+        )}
       </View>
 
       <BottomSheet isVisible={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
@@ -73,20 +141,6 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
           >
             <Ionicons name="play" size={24} color="#666" className="mr-3" />
             <Text className="text-foreground text-lg">Start Workout</Text>
-          </Pressable>
-
-          <Pressable
-            onPress={() => {
-              setIsMenuOpen(false);
-              // router.push({
-              //   pathname: '/(modals)/EditWorkout',
-              //   params: { id: workout.id },
-              // });
-            }}
-            className="flex-row items-center py-4 border-b border-muted"
-          >
-            <Ionicons name="pencil" size={24} color="#666" className="mr-3" />
-            <Text className="text-foreground text-lg">Edit Workout</Text>
           </Pressable>
 
           <Pressable
