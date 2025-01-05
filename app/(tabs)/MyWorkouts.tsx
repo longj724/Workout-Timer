@@ -8,6 +8,7 @@ import { useUser } from '@clerk/clerk-expo';
 import { Text } from '~/components/ui/text';
 import { Button } from '~/components/ui/button';
 import { useGetWorkouts } from '~/hooks/useGetWorkouts';
+import { WorkoutItem } from '~/components/ui/WorkoutItem';
 
 export default function MyWorkouts() {
   const { user } = useUser();
@@ -96,9 +97,7 @@ export default function MyWorkouts() {
         </Text>
       ) : (
         workouts?.map((workout) => (
-          <View key={workout.id} className="bg-card rounded-lg p-4 mb-4">
-            <Text className="text-lg font-semibold">{workout.name}</Text>
-          </View>
+          <WorkoutItem key={workout.id} workout={workout} />
         ))
       )}
     </View>
