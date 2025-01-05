@@ -12,7 +12,6 @@ import {
 import {
   ChevronRight,
   Palette,
-  Ruler,
   Star,
   Store,
   Volume2,
@@ -32,24 +31,33 @@ import { useClerk, useUser } from '@clerk/clerk-expo';
 // Internal Dependencies
 import { Text } from '~/components/ui/text';
 import { Switch } from '~/components/ui/switch';
+import { useStorageMutation, useStorageQuery } from '~/hooks/useStorage';
 
 type SettingsView = 'main' | 'audio' | 'voice' | 'profile';
 type SoundType = 'none' | 'voice' | 'beeps';
 
+type Settings = {
+  countdownSoundType: SoundType;
+  countdownSoundSeconds: number;
+  announceIntervalName: boolean;
+  announceTimeAtTimerStart: boolean;
+};
+
 export default function SettingsScreen() {
   const { user } = useUser();
   const { signOut } = useClerk();
+  const { data: settings } = useStorageQuery<Settings>('settings', {
+    countdownSoundType: 'beeps',
+    countdownSoundSeconds: 5,
+    announceIntervalName: true,
+    announceTimeAtTimerStart: true,
+  });
+  const { mutate: setSettings } = useStorageMutation<Settings>('settings');
 
   const [currentView, setCurrentView] = useState<SettingsView>('main');
-
-  // Audio Settings State
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [countdownSound, setCountdownSound] = useState(true);
-  const [showSecondRemainedPicker, setShowSecondRemainedPicker] =
+  const [showSecondsRemainedPicker, setshowSecondsRemainedPicker] =
     useState(false);
-  const [soundType, setSoundType] = useState<SoundType>('beeps');
 
-  // Voice Assistant Settings
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [timeAnnouncements, setTimeAnnouncements] = useState(true);
 
@@ -65,7 +73,7 @@ export default function SettingsScreen() {
     </View>
   );
 
-  const isAudioDisabled = soundType === 'none';
+  const isAudioDisabled = settings?.countdownSoundType === 'none';
 
   if (currentView === 'audio') {
     return (
@@ -82,12 +90,15 @@ export default function SettingsScreen() {
               key={option.value}
               className="py-4 px-6 flex-row items-center justify-between"
               onPress={() =>
-                setSoundType(option.value.toLowerCase() as SoundType)
+                setSettings({
+                  ...(settings as Settings),
+                  countdownSoundType: option.value.toLowerCase() as SoundType,
+                })
               }
             >
               <Text className="text-lg">{option.label}</Text>
 
-              {soundType === option.value.toLowerCase() && (
+              {settings?.countdownSoundType === option.value.toLowerCase() && (
                 <Check size={24} color="#22c55e" />
               )}
             </Pressable>
@@ -110,7 +121,7 @@ export default function SettingsScreen() {
 
             <Pressable
               className="bg-muted px-4 rounded-md flex items-center justify-center h-10"
-              onPress={() => setShowSecondRemainedPicker(true)}
+              onPress={() => setshowSecondsRemainedPicker(true)}
               disabled={isAudioDisabled}
             >
               <Text
@@ -118,22 +129,28 @@ export default function SettingsScreen() {
                   isAudioDisabled ? 'text-gray-400' : 'text-green-500'
                 }`}
               >
-                5 sec
+                {settings?.countdownSoundSeconds} sec
               </Text>
             </Pressable>
 
             {/* Timer Picker */}
             <TimerPickerModal
               initialValue={{ minutes: 0 }}
-              visible={showSecondRemainedPicker}
-              setIsVisible={setShowSecondRemainedPicker}
-              onConfirm={(pickedDuration) => {}}
+              visible={showSecondsRemainedPicker}
+              setIsVisible={setshowSecondsRemainedPicker}
+              onConfirm={(pickedDuration) => {
+                setSettings({
+                  ...(settings as Settings),
+                  countdownSoundSeconds: pickedDuration.seconds,
+                });
+                setshowSecondsRemainedPicker(false);
+              }}
               padMinutesWithZero={false}
               padSecondsWithZero={false}
               hideHours={true}
               hideMinutes={true}
               modalTitle="Seconds"
-              onCancel={() => setShowSecondRemainedPicker(false)}
+              onCancel={() => setshowSecondsRemainedPicker(false)}
               closeOnOverlayPress
               Audio={Audio}
               LinearGradient={LinearGradient}
@@ -157,13 +174,18 @@ export default function SettingsScreen() {
             <View className="flex-row items-center">
               <View className="w-4/5">
                 <Text className="text-lg">
-                  Announce Interval name at start of the interval
+                  Announce interval name at start of the interval
                 </Text>
               </View>
             </View>
             <Switch
-              checked={countdownSound}
-              onCheckedChange={setCountdownSound}
+              checked={settings?.announceIntervalName ?? true}
+              onCheckedChange={(checked: boolean) => {
+                setSettings({
+                  ...(settings as Settings),
+                  announceIntervalName: checked,
+                });
+              }}
               disabled={isAudioDisabled}
             />
           </View>
@@ -175,8 +197,13 @@ export default function SettingsScreen() {
               </View>
             </View>
             <Switch
-              checked={countdownSound}
-              onCheckedChange={setCountdownSound}
+              checked={settings?.announceTimeAtTimerStart ?? true}
+              onCheckedChange={(checked: boolean) => {
+                setSettings({
+                  ...(settings as Settings),
+                  announceTimeAtTimerStart: checked,
+                });
+              }}
               disabled={isAudioDisabled}
             />
           </View>
