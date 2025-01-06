@@ -19,7 +19,7 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const deleteWorkout = useDeleteWorkout();
 
-  const { intervals, id } = workout;
+  const { intervals } = workout;
 
   const handleDeleteWorkout = async () => {
     try {
@@ -48,7 +48,7 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
   };
 
   const renderIntervals = () => {
-    return intervals.map(({ name, repetitions, timers, order }) => (
+    return intervals.map(({ name, repetitions, timers, order, id }) => (
       <View
         className="flex-row justify-between items-center"
         key={`${name}-${repetitions}-${timers.length}`}

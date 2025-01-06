@@ -13,11 +13,12 @@ export const useEditInterval = () => {
   const { getToken } = useAuth();
 
   return useMutation({
-    mutationFn: async (workout: EditIntervalInput) => {
+    mutationFn: async (interval: EditIntervalInput) => {
       try {
-        const validatedData = editIntervalSchema.parse(workout);
+        const validatedData = editIntervalSchema.parse(interval);
 
-        const response = await fetch(`${API_URL}/workouts/${workout.id}`, {
+        // Can probably get rid of the interval id in the future
+        const response = await fetch(`${API_URL}/workouts/${interval.id}`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${await getToken()}`,

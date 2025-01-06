@@ -19,7 +19,7 @@ import { useEditInterval } from '~/hooks/useEditInterval';
 import { EditIntervalInput, editIntervalSchema } from '~/lib/types';
 
 const EditInterval = () => {
-  const { data: intervals } = useStorageQuery<Interval[]>('intervals', []);
+  const { data: localIntervals } = useStorageQuery<Interval[]>('intervals', []);
   const { mutate: setIntervals } = useStorageMutation<Interval[]>('intervals');
   const { mutate: editInterval } = useEditInterval();
   const params = useLocalSearchParams();
@@ -53,7 +53,10 @@ const EditInterval = () => {
   };
 
   const handleSubmit = () => {
-    if (JSON.parse(editingSavedInterval as string) === true) {
+    if (
+      editingSavedInterval &&
+      JSON.parse(editingSavedInterval as string) === true
+    ) {
       const formData: EditIntervalInput = {
         id: id as string,
         name,
@@ -79,7 +82,7 @@ const EditInterval = () => {
 
         const validated = editIntervalSchema.parse(formData);
 
-        const updatedIntervals = intervals?.map((interval) => {
+        const updatedIntervals = localIntervals?.map((interval) => {
           if (interval.id === id) {
             return { ...interval, ...validated };
           }
