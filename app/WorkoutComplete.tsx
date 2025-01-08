@@ -1,23 +1,23 @@
 // External Dependencies
 import { View } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
-import { Timer, BarChart, Repeat, PartyPopper } from 'lucide-react-native';
-import { SignedIn } from '@clerk/clerk-expo';
+import { Timer, BarChart, PartyPopper } from 'lucide-react-native';
+import { useUser } from '@clerk/clerk-expo';
 
 // Internal Dependencies
 import { Text } from '~/components/ui/text';
 import { Button } from '~/components/ui/button';
-import { useCreateWorkout } from '~/hooks/useCreateWorkout';
 import { Card, CardContent, CardFooter } from '~/components/ui/card';
+import { useCompleteWorkout } from '~/hooks/useCompleteWorkout';
 
 const WorkoutComplete = () => {
-  const { stats, workout } = useLocalSearchParams<{
+  const { user } = useUser();
+  const { stats, workoutId } = useLocalSearchParams<{
     stats: string;
-    workout: string;
+    workoutId: string;
   }>();
   const workoutStats = JSON.parse(stats || '{}');
-  const workoutData = JSON.parse(workout || '{}');
-  const createWorkoutMutation = useCreateWorkout();
+  const completeWorkoutMutation = useCompleteWorkout();
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -25,14 +25,16 @@ const WorkoutComplete = () => {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const handleSaveWorkout = () => {
-    createWorkoutMutation.mutate({
-      name: `${
-        workoutData.name || 'Workout'
-      } - ${new Date().toLocaleDateString()}`,
-      intervals: workoutData.intervals,
-      userId: '1',
-    });
+  const handleFinishWorkout = () => {
+    if (user) {
+      completeWorkoutMutation.mutate({
+        workoutId,
+        userId: user.id,
+        dateCompleted: new Date(),
+        duration: workoutStats.totalTime,
+      });
+    }
+    router.push('/');
   };
 
   return (
@@ -63,31 +65,18 @@ const WorkoutComplete = () => {
                     {workoutStats.totalIntervals}
                   </Text>
                 </View>
-
-                <View className="flex flex-row items-center justify-center gap-4 p-4 rounded-lg bg-muted">
-                  <Repeat className="w-6 h-6 text-primary" />
-                  <Text>Total Repetitions</Text>
-                  <Text className="text-2xl font-semibold">
-                    {workoutStats.totalRepetitions}
-                  </Text>
-                </View>
               </View>
             </View>
           </CardContent>
 
           <CardFooter className="flex flex-col gap-2 p-6">
-            <SignedIn>
-              <Button className="w-full" size="lg" onPress={handleSaveWorkout}>
-                <Text>Save Workout</Text>
-              </Button>
-            </SignedIn>
             <Button
               variant="outline"
               className="w-full"
               size="lg"
-              onPress={() => router.push('/')}
+              onPress={handleFinishWorkout}
             >
-              <Text>Back to Home</Text>
+              <Text>Done</Text>
             </Button>
           </CardFooter>
         </Card>

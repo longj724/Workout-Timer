@@ -1,17 +1,36 @@
-// External D
-import { View } from 'react-native';
-import { useRouter } from 'expo-router';
-import React from 'react';
+// External Dependencies
+import { View, Dimensions } from 'react-native';
+import React, { useState } from 'react';
 import { useOAuth } from '@clerk/clerk-expo';
+import { format, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
+import { BarChart } from 'react-native-chart-kit';
 
 // Internal Dependencies
 import { Text } from '~/components/ui/text';
 import { Button } from '~/components/ui/button';
 import { useUser } from '@clerk/clerk-expo';
+import { useGetCompletedWorkouts } from '~/hooks/useGetCompletedWorkouts';
+import { Ionicons } from '@expo/vector-icons';
 
 const History = () => {
-  const router = useRouter();
   const { user } = useUser();
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
+
+  const { data: completedWorkouts, isLoading } = useGetCompletedWorkouts({
+    userId: user?.id || '',
+    startDate: weekStart,
+    endDate: weekEnd,
+  });
+
+  const navigateWeek = (direction: 'next' | 'prev') => {
+    setCurrentDate((current) =>
+      direction === 'next' ? addWeeks(current, 1) : subWeeks(current, 1)
+    );
+  };
+
   const { startOAuthFlow: startGoogleFlow } = useOAuth({
     strategy: 'oauth_google',
   });
@@ -39,6 +58,35 @@ const History = () => {
     } catch (err) {
       console.error('OAuth error', err);
     }
+  };
+
+  const prepareChartData = () => {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const dailyTotals = new Array(7).fill(0);
+
+    completedWorkouts?.forEach((workout) => {
+      const date = new Date(workout.dateCompleted);
+      const dayIndex = (date.getDay() + 6) % 7; // Adjusting to make Monday index 0
+      dailyTotals[dayIndex] += workout.duration || 0;
+    });
+
+    return {
+      labels: days,
+      datasets: [
+        {
+          data: dailyTotals,
+        },
+      ],
+    };
+  };
+
+  const chartConfig = {
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    strokeWidth: 2,
+    barPercentage: 0.5,
+    decimalPlaces: 0,
   };
 
   if (!user) {
@@ -73,7 +121,65 @@ const History = () => {
   return (
     <View className="flex-1 bg-background p-4">
       <Text className="text-2xl font-bold mb-4">My Workouts</Text>
-      {/* Add your workout history list here */}
+
+      <View className="flex-row items-center justify-between mb-4 w-full">
+        <Button variant="outline" onPress={() => navigateWeek('prev')}>
+          <Ionicons name="arrow-back" size={16} />
+        </Button>
+
+        <Text className="text-lg">
+          {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
+        </Text>
+
+        <Button variant="outline" onPress={() => navigateWeek('next')}>
+          <Ionicons name="arrow-forward" size={16} />
+        </Button>
+      </View>
+
+      {/* Workouts List */}
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <Text>Loading workouts...</Text>
+        </View>
+      ) : completedWorkouts?.length ? (
+        <View>
+          <View className="mb-6">
+            <BarChart
+              data={prepareChartData()}
+              width={Dimensions.get('window').width - 32}
+              height={220}
+              yAxisLabel=""
+              yAxisSuffix="m"
+              chartConfig={chartConfig}
+              style={{
+                marginVertical: 8,
+                borderRadius: 16,
+              }}
+            />
+          </View>
+
+          {completedWorkouts.map((workout) => (
+            <View
+              key={workout.id}
+              className="bg-card p-4 rounded-lg mb-3 border border-border"
+            >
+              <Text className="text-muted-foreground">
+                {format(
+                  new Date(workout.dateCompleted),
+                  'MMM d, yyyy - h:mm a'
+                )}
+              </Text>
+              <Text className="mt-2">Duration: {workout.duration} minutes</Text>
+            </View>
+          ))}
+        </View>
+      ) : (
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-muted-foreground">
+            No workouts completed this week
+          </Text>
+        </View>
+      )}
     </View>
   );
 };

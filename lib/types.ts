@@ -1,3 +1,4 @@
+// External Dependencies
 import { z } from 'zod';
 
 export type Timer = {
@@ -37,10 +38,34 @@ export const editIntervalSchema = createIntervalSchema.extend({
   id: z.string(),
 });
 
+export const completeWorkoutSchema = z.object({
+  workoutId: z.string().optional(),
+  userId: z.string(),
+  dateCompleted: z.date(),
+  duration: z.number().min(0),
+});
+
+export const getCompletedWorkoutsSchema = z
+  .object({
+    userId: z.string(),
+    startDate: z.date(),
+    endDate: z.date(),
+  })
+  .refine((data) => data.endDate > data.startDate, {
+    message: 'End date cannot be earlier than start date.',
+    path: ['endDate'],
+  });
+
 export type CreateTimerInput = z.infer<typeof createTimerSchema>;
 export type CreateIntervalInput = z.infer<typeof createIntervalSchema>;
 export type CreateWorkoutInput = z.infer<typeof createWorkoutSchema>;
 export type EditIntervalInput = z.infer<typeof editIntervalSchema>;
+export type CompleteWorkoutInput = z.infer<typeof completeWorkoutSchema>;
+export type GetCompletedWorkoutInput = {
+  userId: string;
+  startDate: Date;
+  endDate: Date;
+};
 
 export const timerWithMetadataSchema = z.object({
   id: z.string(),

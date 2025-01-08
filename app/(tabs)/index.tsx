@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 // Internal Dependencies
 import { IntervalItem } from '~/components/ui/IntervalItem';
 import { Interval } from '~/lib/types';
-import { useAsyncStorage, useStorageQuery } from '~/hooks/useStorage';
+import { useStorageQuery } from '~/hooks/useStorage';
 
 const defaultIntervals: Interval[] = [
   {
@@ -79,6 +79,7 @@ export default function Home() {
             params: { intervalInfo: JSON.stringify(intervals) },
           })
         }
+        disabled={intervals?.length === 0}
       >
         <Text className="text-primary-foreground text-xl font-semibold">
           Start Workout

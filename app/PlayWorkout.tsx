@@ -12,7 +12,10 @@ import { Text } from '~/components/ui/text';
 import { Card } from '~/components/ui/card';
 
 const PlayWorkout = () => {
-  const { intervalInfo } = useLocalSearchParams<{ intervalInfo: string }>();
+  const { intervalInfo, workoutId } = useLocalSearchParams<{
+    intervalInfo: string;
+    workoutId?: string;
+  }>();
 
   const [key, setKey] = useState('0,0,1');
   const [intervals, setIntervals] = useState<Interval[]>(
@@ -108,7 +111,6 @@ const PlayWorkout = () => {
             return acc + intervalTime * interval.repetitions;
           }, 0);
 
-          // Navigate to workout complete with stats
           router.push({
             pathname: '/WorkoutComplete',
             params: {
@@ -120,7 +122,8 @@ const PlayWorkout = () => {
                   0
                 ),
               }),
-              workout: JSON.stringify(intervals),
+              workoutId: workoutId || null,
+              intervals: JSON.stringify(intervals),
             },
           });
         }
