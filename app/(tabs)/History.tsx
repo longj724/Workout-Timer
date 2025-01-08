@@ -1,5 +1,5 @@
 // External Dependencies
-import { View, Dimensions } from 'react-native';
+import { ActivityIndicator, Dimensions, ScrollView, View } from 'react-native';
 import React, { useState } from 'react';
 import { useOAuth } from '@clerk/clerk-expo';
 import { format, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
@@ -11,6 +11,14 @@ import { Button } from '~/components/ui/button';
 import { useUser } from '@clerk/clerk-expo';
 import { useGetCompletedWorkouts } from '~/hooks/useGetCompletedWorkouts';
 import { Ionicons } from '@expo/vector-icons';
+
+const calculateTotalMinutes = (
+  hours: number | null,
+  minutes: number | null,
+  seconds: number | null
+) => {
+  return (hours || 0) * 60 + (minutes || 0) + Math.round((seconds || 0) / 60);
+};
 
 const History = () => {
   const { user } = useUser();
@@ -67,7 +75,12 @@ const History = () => {
     completedWorkouts?.forEach((workout) => {
       const date = new Date(workout.dateCompleted);
       const dayIndex = (date.getDay() + 6) % 7; // Adjusting to make Monday index 0
-      dailyTotals[dayIndex] += workout.duration || 0;
+      const totalMinutes = calculateTotalMinutes(
+        workout.duration_hours,
+        workout.duration_minutes,
+        workout.duration_seconds
+      );
+      dailyTotals[dayIndex] += totalMinutes;
     });
 
     return {
@@ -139,10 +152,10 @@ const History = () => {
       {/* Workouts List */}
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <Text>Loading workouts...</Text>
+          <ActivityIndicator size="large" color="gray" />
         </View>
       ) : completedWorkouts?.length ? (
-        <View>
+        <ScrollView>
           <View className="mb-6">
             <BarChart
               data={prepareChartData()}
@@ -169,10 +182,14 @@ const History = () => {
                   'MMM d, yyyy - h:mm a'
                 )}
               </Text>
-              <Text className="mt-2">Duration: {workout.duration} minutes</Text>
+              <Text className="mt-2">
+                Duration:{' '}
+                {workout.duration_hours ? `${workout.duration_hours}h ` : ''}
+                {workout.duration_minutes}m {workout.duration_seconds}s
+              </Text>
             </View>
           ))}
-        </View>
+        </ScrollView>
       ) : (
         <View className="flex-1 items-center justify-center">
           <Text className="text-muted-foreground">

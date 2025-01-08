@@ -42,7 +42,9 @@ export const completeWorkoutSchema = z.object({
   workoutId: z.string().optional(),
   userId: z.string(),
   dateCompleted: z.date(),
-  duration: z.number().min(0),
+  duration_hours: z.number().min(0),
+  duration_minutes: z.number().min(0),
+  duration_seconds: z.number().min(0),
 });
 
 export const getCompletedWorkoutsSchema = z

@@ -1,4 +1,5 @@
 // External Dependencies
+import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Timer, BarChart, PartyPopper } from 'lucide-react-native';
@@ -10,14 +11,26 @@ import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardFooter } from '~/components/ui/card';
 import { useCompleteWorkout } from '~/hooks/useCompleteWorkout';
 
+export type TotalTime = {
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
+
 const WorkoutComplete = () => {
   const { user } = useUser();
   const { stats, workoutId } = useLocalSearchParams<{
     stats: string;
     workoutId: string;
   }>();
-  const workoutStats = JSON.parse(stats || '{}');
+  const workoutStats = useMemo(() => JSON.parse(stats || '{}'), [stats]);
   const completeWorkoutMutation = useCompleteWorkout();
+
+  const [totalTime, setTotalTime] = useState<TotalTime>({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -31,11 +44,20 @@ const WorkoutComplete = () => {
         workoutId,
         userId: user.id,
         dateCompleted: new Date(),
-        duration: workoutStats.totalTime,
+        duration_hours: totalTime.hours,
+        duration_minutes: totalTime.minutes,
+        duration_seconds: totalTime.seconds,
       });
     }
     router.push('/');
   };
+
+  useEffect(() => {
+    const hours = Math.floor(workoutStats.totalTime / 3600);
+    const minutes = Math.floor((workoutStats.totalTime % 3600) / 60);
+    const seconds = workoutStats.totalTime % 60;
+    setTotalTime({ hours, minutes, seconds });
+  }, [workoutStats]);
 
   return (
     <>

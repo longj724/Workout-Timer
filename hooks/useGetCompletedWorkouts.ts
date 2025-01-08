@@ -15,7 +15,9 @@ type CompletedWorkout = {
   workoutId?: string;
   userId: string;
   dateCompleted: string;
-  duration: number;
+  duration_hours: number;
+  duration_minutes: number;
+  duration_seconds: number;
 };
 
 export const useGetCompletedWorkouts = (

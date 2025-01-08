@@ -28,7 +28,7 @@ const PlayWorkout = () => {
   const [curTimerTotalSeconds, setCurTimerTotalSeconds] = useState(0);
   const [curRepetition, setCurRepetition] = useState(1);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [totalRemainingSeconds, setTotalRemainingSeconds] = useState(0);
+  const [totalRemainingSeconds, setTotalRemainingSeconds] = useState(-1);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -61,7 +61,9 @@ const PlayWorkout = () => {
 
   useEffect(() => {
     // Initialize total time
-    setTotalRemainingSeconds(calculateInitialTotalTime());
+    if (totalRemainingSeconds === -1) {
+      setTotalRemainingSeconds(calculateInitialTotalTime());
+    }
 
     // Clear any existing interval
     if (intervalRef.current) {
@@ -115,6 +117,7 @@ const PlayWorkout = () => {
             pathname: '/WorkoutComplete',
             params: {
               stats: JSON.stringify({
+                // Total Time in seconds
                 totalTime,
                 totalIntervals: intervals.length,
                 totalRepetitions: intervals.reduce(
