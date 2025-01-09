@@ -5,13 +5,24 @@ import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { useLocalSearchParams } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import * as Speech from 'expo-speech';
 
 // Internal Dependencies
 import { Interval, Timer } from '~/lib/types';
 import { Text } from '~/components/ui/text';
 import { Card } from '~/components/ui/card';
+import { useStorageQuery } from '~/hooks/useStorage';
+import { Settings } from '~/lib/types';
 
 const PlayWorkout = () => {
+  const { data: settings } = useStorageQuery<Settings>('settings', {
+    countdownSoundType: 'beeps',
+    countdownSoundSeconds: 5,
+    announceIntervalName: true,
+    announceTimeAtTimerStart: true,
+    selectedVoiceIdentifier: 'com.apple.ttsbundle.siri_female_en-US_compact',
+  });
+
   const { intervalInfo, workoutId } = useLocalSearchParams<{
     intervalInfo: string;
     workoutId?: string;
@@ -222,6 +233,15 @@ const PlayWorkout = () => {
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <CountdownCircleTimer
+          onUpdate={(remainingTime) => {
+            if (
+              settings?.countdownSoundSeconds &&
+              settings?.countdownSoundSeconds >= remainingTime &&
+              remainingTime !== 0
+            ) {
+              Speech.speak(remainingTime.toString());
+            }
+          }}
           key={key}
           isPlaying={isPlaying}
           duration={curTimerTotalSeconds}

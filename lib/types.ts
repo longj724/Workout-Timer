@@ -101,3 +101,13 @@ export const workoutWithRelationsSchema = z.object({
 
 export type WorkoutWithRelations = z.infer<typeof workoutWithRelationsSchema>;
 export type WorkoutsList = WorkoutWithRelations[];
+
+export type SoundType = 'none' | 'voice' | 'beeps';
+
+export type Settings = {
+  countdownSoundType: SoundType;
+  countdownSoundSeconds: number;
+  announceIntervalName: boolean;
+  announceTimeAtTimerStart: boolean;
+  selectedVoiceIdentifier: string;
+};

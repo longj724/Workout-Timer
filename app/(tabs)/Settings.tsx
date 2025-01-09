@@ -1,5 +1,5 @@
 // External Dependencies
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -17,28 +17,23 @@ import {
   Check,
   User,
   LogOut,
+  Play,
 } from 'lucide-react-native';
 import { TimerPickerModal } from 'react-native-timer-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
 import { useClerk, useUser } from '@clerk/clerk-expo';
+import * as Speech from 'expo-speech';
 
 // Internal Dependencies
 import { Text } from '~/components/ui/text';
 import { Switch } from '~/components/ui/switch';
 import { useStorageMutation, useStorageQuery } from '~/hooks/useStorage';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { Settings, SoundType } from '~/lib/types';
 
 type SettingsView = 'main' | 'audio' | 'voice' | 'profile';
-type SoundType = 'none' | 'voice' | 'beeps';
-
-type Settings = {
-  countdownSoundType: SoundType;
-  countdownSoundSeconds: number;
-  announceIntervalName: boolean;
-  announceTimeAtTimerStart: boolean;
-};
 
 export default function SettingsScreen() {
   const { user } = useUser();
@@ -49,14 +44,22 @@ export default function SettingsScreen() {
     countdownSoundSeconds: 5,
     announceIntervalName: true,
     announceTimeAtTimerStart: true,
+    selectedVoiceIdentifier: 'com.apple.ttsbundle.siri_female_en-US_compact',
   });
   const { mutate: setSettings } = useStorageMutation<Settings>('settings');
 
   const [currentView, setCurrentView] = useState<SettingsView>('main');
   const [showSecondsRemainedPicker, setshowSecondsRemainedPicker] =
     useState(false);
+  const [voices, setVoices] = useState<Speech.Voice[]>([]);
 
-  const renderHeader = (title: string, subtitle?: string) => (
+  useEffect(() => {
+    Speech.getAvailableVoicesAsync().then((voices) => {
+      setVoices(voices);
+    });
+  }, []);
+
+  const renderHeader = () => (
     <View className="p-4 flex-col">
       <TouchableOpacity
         onPress={() => setCurrentView('main')}
@@ -73,7 +76,7 @@ export default function SettingsScreen() {
   if (currentView === 'audio') {
     return (
       <SafeAreaView className="flex-1 bg-gray-50">
-        {renderHeader('Audio Alerts', 'Customize your workout sounds')}
+        {renderHeader()}
         <Text className="text-xl ml-4 text-gray-500">Alert Type</Text>
         <View className="mx-2 bg-white rounded-lg shadow divide-y divide-gray-200 mt-2">
           {[
@@ -210,9 +213,41 @@ export default function SettingsScreen() {
   if (currentView === 'voice') {
     return (
       <SafeAreaView className="flex-1 bg-gray-50">
-        {renderHeader('Voice Assistant', 'Configure voice guidance')}
+        {renderHeader()}
+        <Text className="text-xl ml-4 text-gray-500 mb-2">Voice Selection</Text>
         <ScrollView>
-          <View className="mx-4 bg-white rounded-lg shadow divide-y divide-gray-200"></View>
+          <View className="mx-2 bg-white rounded-lg shadow divide-y divide-gray-200">
+            {voices
+              .filter((voice) => voice.language.includes('en'))
+              .map((voice) => (
+                <Pressable
+                  key={voice.identifier}
+                  className="py-4 px-6 flex-row items-center justify-between"
+                  onPress={() => {
+                    setSettings({
+                      ...(settings as Settings),
+                      selectedVoiceIdentifier: voice.identifier,
+                    });
+                  }}
+                >
+                  <Text className="text-lg">{voice.name}</Text>
+                  {/* Button to play the voice */}
+                  {/* <Pressable
+                    onPress={() => {
+                      Speech.speak('Hello, world!', {
+                        voice: voice.identifier,
+                      });
+                    }}
+                  >
+                    <Play size={24} color="#22c55e" />
+                  </Pressable> */}
+
+                  {settings?.selectedVoiceIdentifier === voice.identifier && (
+                    <Check size={24} color="#22c55e" />
+                  )}
+                </Pressable>
+              ))}
+          </View>
         </ScrollView>
       </SafeAreaView>
     );
@@ -221,7 +256,7 @@ export default function SettingsScreen() {
   if (currentView === 'profile') {
     return (
       <SafeAreaView className="flex-1 bg-gray-50">
-        {renderHeader('Profile', 'Manage your account')}
+        {renderHeader()}
         <ScrollView>
           {/* Profile Info */}
           <View className="mx-4 bg-white rounded-lg shadow mb-4">
