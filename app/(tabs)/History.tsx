@@ -13,12 +13,10 @@ import { useGetCompletedWorkouts } from '~/hooks/useGetCompletedWorkouts';
 import { Ionicons } from '@expo/vector-icons';
 
 const calculateTotalMinutes = (
-  hours: number | null,
-  minutes: number | null,
-  seconds: number | null
-) => {
-  return (hours || 0) * 60 + (minutes || 0) + Math.round((seconds || 0) / 60);
-};
+  hours: number,
+  minutes: number,
+  seconds: number
+) => hours * 60.0 + minutes + seconds / 60.0;
 
 const History = () => {
   const { user } = useUser();
@@ -98,8 +96,8 @@ const History = () => {
     backgroundGradientTo: '#ffffff',
     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     strokeWidth: 2,
-    barPercentage: 0.5,
-    decimalPlaces: 0,
+    barPercentage: 0.7,
+    decimalPlaces: 1,
   };
 
   if (!user) {
@@ -162,7 +160,7 @@ const History = () => {
               width={Dimensions.get('window').width - 32}
               height={220}
               yAxisLabel=""
-              yAxisSuffix="m"
+              yAxisSuffix=" min"
               chartConfig={chartConfig}
               style={{
                 marginVertical: 8,
