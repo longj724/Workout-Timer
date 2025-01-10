@@ -170,12 +170,12 @@ const PlayWorkout = () => {
   };
 
   const handleClose = () => {
-    handlePlayPause();
+    setIsPlaying(false);
     Alert.alert('Quit Workout', 'Are you sure you want to quit this workout?', [
       {
         text: 'Cancel',
         style: 'cancel',
-        onPress: () => handlePlayPause(),
+        // onPress: () => handlePlayPause(),
       },
       {
         text: 'Quit',
