@@ -370,7 +370,7 @@ export default function SettingsScreen() {
         </View>
 
         {/* Settings Groups */}
-        <View className="mx-4 mb-4 bg-white rounded-lg shadow divide-y divide-gray-200">
+        {/* <View className="mx-4 mb-4 bg-white rounded-lg shadow divide-y divide-gray-200">
           {[
             {
               icon: Volume2,
@@ -396,7 +396,7 @@ export default function SettingsScreen() {
               <ChevronRight size={20} color="#9CA3AF" />
             </TouchableOpacity>
           ))}
-          {/* <View className="py-4 px-6 flex-row items-center justify-between">
+          <View className="py-4 px-6 flex-row items-center justify-between">
             <View className="flex-row items-center">
               <View className="w-4/5">
                 <Text className="text-lg">Dark Mode</Text>
@@ -409,7 +409,137 @@ export default function SettingsScreen() {
               }}
               disabled={isAudioDisabled}
             />
-          </View> */}
+          </View>
+        </View> */}
+
+        <Text className="text-xl ml-4 text-gray-500">Alert Type</Text>
+        <View className="mx-2 bg-white rounded-lg shadow divide-y divide-gray-200 mt-2">
+          {[
+            { value: 'None', label: 'None' },
+            { value: 'Voice', label: 'Voice' },
+            { value: 'Beeps', label: 'Beeps' },
+          ].map((option) => (
+            <Pressable
+              key={option.value}
+              className="py-4 px-6 flex-row items-center justify-between"
+              onPress={() =>
+                setSettings({
+                  ...(settings as Settings),
+                  countdownSoundType: option.value.toLowerCase() as SoundType,
+                })
+              }
+            >
+              <Text className="text-lg">{option.label}</Text>
+
+              {settings?.countdownSoundType === option.value.toLowerCase() && (
+                <Check size={24} color="#22c55e" />
+              )}
+            </Pressable>
+          ))}
+        </View>
+
+        <Text className="text-xl ml-4 text-gray-500 mt-4">Audio Alerts</Text>
+        <View
+          className={`mx-2 bg-white rounded-lg shadow divide-y divide-gray-200 mt-2 ${
+            isAudioDisabled ? 'opacity-50' : ''
+          }`}
+        >
+          <View className="py-4 px-6 flex-row items-center">
+            <View className="w-4/5">
+              <Text className="text-lg">Seconds Remaining</Text>
+              <Text className="text-gray-500">
+                Select seconds remaining to start countdown
+              </Text>
+            </View>
+
+            <Pressable
+              className="bg-muted px-4 rounded-md flex items-center justify-center h-10"
+              onPress={() => setshowSecondsRemainedPicker(true)}
+              disabled={isAudioDisabled}
+            >
+              <Text
+                className={`text-md ${
+                  isAudioDisabled ? 'text-gray-400' : 'text-green-500'
+                }`}
+              >
+                {settings?.countdownSoundSeconds} sec
+              </Text>
+            </Pressable>
+
+            {/* Timer Picker */}
+            <TimerPickerModal
+              initialValue={{ minutes: 0 }}
+              visible={showSecondsRemainedPicker}
+              setIsVisible={setshowSecondsRemainedPicker}
+              onConfirm={(pickedDuration) => {
+                setSettings({
+                  ...(settings as Settings),
+                  countdownSoundSeconds: pickedDuration.seconds,
+                });
+                setshowSecondsRemainedPicker(false);
+              }}
+              padMinutesWithZero={false}
+              padSecondsWithZero={false}
+              hideHours={true}
+              hideMinutes={true}
+              modalTitle="Seconds"
+              onCancel={() => setshowSecondsRemainedPicker(false)}
+              closeOnOverlayPress
+              Audio={Audio}
+              LinearGradient={LinearGradient}
+              Haptics={Haptics}
+              styles={{
+                cancelButton: {
+                  backgroundColor: PlatformColor('systemRed'),
+                  color: 'white',
+                  borderColor: PlatformColor('systemRed'),
+                },
+                confirmButton: {
+                  backgroundColor: 'black',
+                  color: 'white',
+                  borderColor: 'black',
+                },
+              }}
+            />
+          </View>
+
+          <View className="py-4 px-6 flex-row items-center justify-between">
+            <View className="flex-row items-center">
+              <View className="w-4/5">
+                <Text className="text-lg">
+                  Announce interval name at start of the interval
+                </Text>
+              </View>
+            </View>
+            <Switch
+              checked={settings?.announceIntervalName ?? true}
+              onCheckedChange={(checked: boolean) => {
+                setSettings({
+                  ...(settings as Settings),
+                  announceIntervalName: checked,
+                });
+              }}
+              disabled={isAudioDisabled}
+            />
+          </View>
+
+          <View className="py-4 px-6 flex-row items-center justify-between">
+            <View className="flex-row items-center">
+              <View className="w-4/5">
+                <Text className="text-lg">Announce time at start of timer</Text>
+              </View>
+            </View>
+            <Switch
+              checked={settings?.announceTimeAtTimerStart ?? true}
+              onCheckedChange={(checked: boolean) => {
+                setSettings({
+                  ...(settings as Settings),
+                  announceTimeAtTimerStart: checked,
+                });
+              }}
+              disabled={isAudioDisabled}
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
