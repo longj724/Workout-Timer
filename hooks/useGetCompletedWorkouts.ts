@@ -4,21 +4,12 @@ import { useAuth } from '@clerk/clerk-expo';
 
 // Internal Dependencies
 import {
+  CompletedWorkout,
   GetCompletedWorkoutInput,
   getCompletedWorkoutsSchema,
 } from '../lib/types';
 
 const API_URL = 'http://localhost:9999';
-
-type CompletedWorkout = {
-  id: string;
-  workoutId?: string;
-  userId: string;
-  dateCompleted: string;
-  duration_hours: number;
-  duration_minutes: number;
-  duration_seconds: number;
-};
 
 export const useGetCompletedWorkouts = (
   workoutData: GetCompletedWorkoutInput

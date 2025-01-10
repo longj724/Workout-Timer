@@ -111,3 +111,13 @@ export type Settings = {
   announceTimeAtTimerStart: boolean;
   selectedVoiceIdentifier: string;
 };
+
+export type CompletedWorkout = {
+  id: string;
+  workoutId?: string;
+  userId: string;
+  dateCompleted: string;
+  duration_hours: number;
+  duration_minutes: number;
+  duration_seconds: number;
+};

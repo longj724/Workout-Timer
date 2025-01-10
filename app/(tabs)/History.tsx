@@ -11,6 +11,7 @@ import { Button } from '~/components/ui/button';
 import { useUser } from '@clerk/clerk-expo';
 import { useGetCompletedWorkouts } from '~/hooks/useGetCompletedWorkouts';
 import { Ionicons } from '@expo/vector-icons';
+import { CompletedWorkout } from '~/lib/types';
 
 const calculateTotalMinutes = (
   hours: number,
@@ -129,6 +130,23 @@ const History = () => {
     );
   }
 
+  const calculateTotalTime = (workouts: CompletedWorkout[]) => {
+    const totalTimeInMinutes = workouts.reduce((total, workout) => {
+      return (
+        total +
+        calculateTotalMinutes(
+          workout.duration_hours,
+          workout.duration_minutes,
+          workout.duration_seconds
+        )
+      );
+    }, 0);
+
+    return `${Math.floor(totalTimeInMinutes / 60)}h ${(
+      totalTimeInMinutes % 60
+    ).toPrecision(1)}m`;
+  };
+
   return (
     <View className="flex-1 bg-background p-4">
       <Text className="text-2xl font-bold mb-4">My Workouts</Text>
@@ -154,7 +172,7 @@ const History = () => {
         </View>
       ) : completedWorkouts?.length ? (
         <ScrollView>
-          <View className="mb-6">
+          <View className="mb-2">
             <BarChart
               data={prepareChartData()}
               width={Dimensions.get('window').width - 32}
@@ -168,6 +186,10 @@ const History = () => {
               }}
             />
           </View>
+
+          <Text className="font-semibold text-lg mb-2">
+            Total Time: {calculateTotalTime(completedWorkouts)}
+          </Text>
 
           {completedWorkouts.map((workout) => (
             <View
