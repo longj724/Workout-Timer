@@ -35,6 +35,13 @@ import { Settings, SoundType } from '~/lib/types';
 
 type SettingsView = 'main' | 'audio' | 'voice' | 'profile';
 
+// Add consistent spacing and styling
+const SECTION_SPACING = 'mx-4 mb-4';
+const SECTION_STYLE = 'bg-white rounded-lg shadow';
+const ITEM_PADDING = 'p-4';
+const ICON_CONTAINER = 'h-10 w-10 rounded-xl items-center justify-center';
+const SECTION_HEADER = 'text-xl ml-4 text-gray-500 mb-2';
+
 export default function SettingsScreen() {
   const { user } = useUser();
   const { signOut } = useClerk();
@@ -77,135 +84,6 @@ export default function SettingsScreen() {
     return (
       <SafeAreaView className="flex-1 bg-gray-50">
         {renderHeader()}
-        <Text className="text-xl ml-4 text-gray-500">Alert Type</Text>
-        <View className="mx-2 bg-white rounded-lg shadow divide-y divide-gray-200 mt-2">
-          {[
-            { value: 'None', label: 'None' },
-            { value: 'Voice', label: 'Voice' },
-            { value: 'Beeps', label: 'Beeps' },
-          ].map((option) => (
-            <Pressable
-              key={option.value}
-              className="py-4 px-6 flex-row items-center justify-between"
-              onPress={() =>
-                setSettings({
-                  ...(settings as Settings),
-                  countdownSoundType: option.value.toLowerCase() as SoundType,
-                })
-              }
-            >
-              <Text className="text-lg">{option.label}</Text>
-
-              {settings?.countdownSoundType === option.value.toLowerCase() && (
-                <Check size={24} color="#22c55e" />
-              )}
-            </Pressable>
-          ))}
-        </View>
-
-        <Text className="text-xl ml-4 text-gray-500 mt-4">Audio Alerts</Text>
-        <View
-          className={`mx-2 bg-white rounded-lg shadow divide-y divide-gray-200 mt-2 ${
-            isAudioDisabled ? 'opacity-50' : ''
-          }`}
-        >
-          <View className="py-4 px-6 flex-row items-center">
-            <View className="w-4/5">
-              <Text className="text-lg">Seconds Remaining</Text>
-              <Text className="text-gray-500">
-                Select seconds remaining to start countdown
-              </Text>
-            </View>
-
-            <Pressable
-              className="bg-muted px-4 rounded-md flex items-center justify-center h-10"
-              onPress={() => setshowSecondsRemainedPicker(true)}
-              disabled={isAudioDisabled}
-            >
-              <Text
-                className={`text-md ${
-                  isAudioDisabled ? 'text-gray-400' : 'text-green-500'
-                }`}
-              >
-                {settings?.countdownSoundSeconds} sec
-              </Text>
-            </Pressable>
-
-            {/* Timer Picker */}
-            <TimerPickerModal
-              initialValue={{ minutes: 0 }}
-              visible={showSecondsRemainedPicker}
-              setIsVisible={setshowSecondsRemainedPicker}
-              onConfirm={(pickedDuration) => {
-                setSettings({
-                  ...(settings as Settings),
-                  countdownSoundSeconds: pickedDuration.seconds,
-                });
-                setshowSecondsRemainedPicker(false);
-              }}
-              padMinutesWithZero={false}
-              padSecondsWithZero={false}
-              hideHours={true}
-              hideMinutes={true}
-              modalTitle="Seconds"
-              onCancel={() => setshowSecondsRemainedPicker(false)}
-              closeOnOverlayPress
-              Audio={Audio}
-              LinearGradient={LinearGradient}
-              Haptics={Haptics}
-              styles={{
-                cancelButton: {
-                  backgroundColor: PlatformColor('systemRed'),
-                  color: 'white',
-                  borderColor: PlatformColor('systemRed'),
-                },
-                confirmButton: {
-                  backgroundColor: 'black',
-                  color: 'white',
-                  borderColor: 'black',
-                },
-              }}
-            />
-          </View>
-
-          <View className="py-4 px-6 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <View className="w-4/5">
-                <Text className="text-lg">
-                  Announce interval name at start of the interval
-                </Text>
-              </View>
-            </View>
-            <Switch
-              checked={settings?.announceIntervalName ?? true}
-              onCheckedChange={(checked: boolean) => {
-                setSettings({
-                  ...(settings as Settings),
-                  announceIntervalName: checked,
-                });
-              }}
-              disabled={isAudioDisabled}
-            />
-          </View>
-
-          <View className="py-4 px-6 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <View className="w-4/5">
-                <Text className="text-lg">Announce time at start of timer</Text>
-              </View>
-            </View>
-            <Switch
-              checked={settings?.announceTimeAtTimerStart ?? true}
-              onCheckedChange={(checked: boolean) => {
-                setSettings({
-                  ...(settings as Settings),
-                  announceTimeAtTimerStart: checked,
-                });
-              }}
-              disabled={isAudioDisabled}
-            />
-          </View>
-        </View>
       </SafeAreaView>
     );
   }
@@ -318,15 +196,15 @@ export default function SettingsScreen() {
   // Main Settings View
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-      <ScrollView className="flex-1">
+      <ScrollView className="flex-1 pt-4">
         {/* User Profile Section */}
         {user && (
-          <View className="mx-4 mb-4 bg-white rounded-lg shadow mt-4">
+          <View className={`${SECTION_SPACING} ${SECTION_STYLE}`}>
             <TouchableOpacity
-              className="p-4 flex-row items-center"
+              className={`${ITEM_PADDING} flex-row items-center`}
               onPress={() => setCurrentView('profile')}
             >
-              <View className="h-14 w-14 rounded-full bg-gray-200 items-center justify-center overflow-hidden">
+              <View className="h-12 w-12 rounded-full bg-gray-200 items-center justify-center overflow-hidden">
                 {user.imageUrl ? (
                   <Image
                     source={{ uri: user.imageUrl }}
@@ -338,10 +216,10 @@ export default function SettingsScreen() {
                 )}
               </View>
               <View className="ml-4 flex-1">
-                <Text className="text-lg font-medium">
+                <Text className="text-base font-medium">
                   {user.fullName || user.firstName || 'User'}
                 </Text>
-                <Text className="text-gray-500">
+                <Text className="text-sm text-gray-500">
                   {user.emailAddresses[0].emailAddress}
                 </Text>
               </View>
@@ -350,70 +228,20 @@ export default function SettingsScreen() {
           </View>
         )}
 
-        {/* Review & Membership */}
-        <View className="mx-4 mb-4 bg-white rounded-lg shadow divide-y divide-gray-200 mt-4">
-          <TouchableOpacity className="flex flex-row items-center p-4">
-            <View className="h-10 w-10 rounded-xl bg-amber-400 items-center justify-center">
+        {/* Review Section */}
+        <View className={`${SECTION_SPACING} ${SECTION_STYLE}`}>
+          <TouchableOpacity className={`${ITEM_PADDING} flex-row items-center`}>
+            <View className={`${ICON_CONTAINER} bg-amber-400`}>
               <Star size={24} color="white" />
             </View>
-            <Text className="flex-1 ml-4 text-lg">Write Review</Text>
+            <Text className="flex-1 ml-4 text-base">Write Review</Text>
             <ChevronRight size={20} color="#9CA3AF" />
           </TouchableOpacity>
-
-          {/* <TouchableOpacity className="flex flex-row items-center p-4">
-            <View className="h-10 w-10 rounded-xl bg-blue-500 items-center justify-center">
-              <Store size={24} color="white" />
-            </View>
-            <Text className="flex-1 ml-4 text-lg">Membership</Text>
-            <ChevronRight size={20} color="#9CA3AF" />
-          </TouchableOpacity> */}
         </View>
 
-        {/* Settings Groups */}
-        {/* <View className="mx-4 mb-4 bg-white rounded-lg shadow divide-y divide-gray-200">
-          {[
-            {
-              icon: Volume2,
-              title: 'Audio Alerts',
-              onPress: () => setCurrentView('audio'),
-            },
-            {
-              icon: User,
-              title: 'Voice Assistant',
-              onPress: () => setCurrentView('voice'),
-            },
-          ].map((item) => (
-            <TouchableOpacity
-              key={item.title}
-              className="flex flex-row items-center p-4"
-              onPress={item.onPress}
-            >
-              <View className="h-10 w-10 rounded-xl bg-gray-100 items-center justify-center">
-                <item.icon size={24} />
-              </View>
-              <Text className="flex-1 ml-4 text-lg">{item.title}</Text>
-
-              <ChevronRight size={20} color="#9CA3AF" />
-            </TouchableOpacity>
-          ))}
-          <View className="py-4 px-6 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <View className="w-4/5">
-                <Text className="text-lg">Dark Mode</Text>
-              </View>
-            </View>
-            <Switch
-              checked={isDarkColorScheme}
-              onCheckedChange={(checked: boolean) => {
-                setColorScheme(checked ? 'dark' : 'light');
-              }}
-              disabled={isAudioDisabled}
-            />
-          </View>
-        </View> */}
-
-        <Text className="text-xl ml-4 text-gray-500">Alert Type</Text>
-        <View className="mx-2 bg-white rounded-lg shadow divide-y divide-gray-200 mt-2">
+        {/* Alert Type Section */}
+        <Text className={SECTION_HEADER}>Alert Type</Text>
+        <View className={`${SECTION_SPACING} ${SECTION_STYLE}`}>
           {[
             { value: 'None', label: 'None' },
             { value: 'Voice', label: 'Voice' },
@@ -421,7 +249,7 @@ export default function SettingsScreen() {
           ].map((option) => (
             <Pressable
               key={option.value}
-              className="py-4 px-6 flex-row items-center justify-between"
+              className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100 last:border-b-0`}
               onPress={() =>
                 setSettings({
                   ...(settings as Settings),
@@ -429,8 +257,7 @@ export default function SettingsScreen() {
                 })
               }
             >
-              <Text className="text-lg">{option.label}</Text>
-
+              <Text className="text-base">{option.label}</Text>
               {settings?.countdownSoundType === option.value.toLowerCase() && (
                 <Check size={24} color="#22c55e" />
               )}
@@ -438,78 +265,40 @@ export default function SettingsScreen() {
           ))}
         </View>
 
-        <Text className="text-xl ml-4 text-gray-500 mt-4">Audio Alerts</Text>
+        {/* Audio Alerts Section */}
+        <Text className={SECTION_HEADER}>Audio Alerts</Text>
         <View
-          className={`mx-2 bg-white rounded-lg shadow divide-y divide-gray-200 mt-2 ${
+          className={`${SECTION_SPACING} ${SECTION_STYLE} ${
             isAudioDisabled ? 'opacity-50' : ''
           }`}
         >
-          <View className="py-4 px-6 flex-row items-center">
-            <View className="w-4/5">
-              <Text className="text-lg">Seconds Remaining</Text>
-              <Text className="text-gray-500">
+          <View
+            className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100`}
+          >
+            <View className="flex-1">
+              <Text className="text-base">Seconds Remaining</Text>
+              <Text className="text-sm text-gray-500">
                 Select seconds remaining to start countdown
               </Text>
             </View>
-
             <Pressable
-              className="bg-muted px-4 rounded-md flex items-center justify-center h-10"
+              className="bg-gray-100 px-4 rounded-md flex items-center justify-center h-9"
               onPress={() => setshowSecondsRemainedPicker(true)}
               disabled={isAudioDisabled}
             >
               <Text
-                className={`text-md ${
-                  isAudioDisabled ? 'text-gray-400' : 'text-green-500'
-                }`}
+                className={isAudioDisabled ? 'text-gray-400' : 'text-green-500'}
               >
                 {settings?.countdownSoundSeconds} sec
               </Text>
             </Pressable>
-
-            {/* Timer Picker */}
-            <TimerPickerModal
-              initialValue={{ minutes: 0 }}
-              visible={showSecondsRemainedPicker}
-              setIsVisible={setshowSecondsRemainedPicker}
-              onConfirm={(pickedDuration) => {
-                setSettings({
-                  ...(settings as Settings),
-                  countdownSoundSeconds: pickedDuration.seconds,
-                });
-                setshowSecondsRemainedPicker(false);
-              }}
-              padMinutesWithZero={false}
-              padSecondsWithZero={false}
-              hideHours={true}
-              hideMinutes={true}
-              modalTitle="Seconds"
-              onCancel={() => setshowSecondsRemainedPicker(false)}
-              closeOnOverlayPress
-              Audio={Audio}
-              LinearGradient={LinearGradient}
-              Haptics={Haptics}
-              styles={{
-                cancelButton: {
-                  backgroundColor: PlatformColor('systemRed'),
-                  color: 'white',
-                  borderColor: PlatformColor('systemRed'),
-                },
-                confirmButton: {
-                  backgroundColor: 'black',
-                  color: 'white',
-                  borderColor: 'black',
-                },
-              }}
-            />
           </View>
 
-          <View className="py-4 px-6 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <View className="w-4/5">
-                <Text className="text-lg">
-                  Announce interval name at start of the interval
-                </Text>
-              </View>
+          <View
+            className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100`}
+          >
+            <View className="flex-1">
+              <Text className="text-base">Announce interval name at start</Text>
             </View>
             <Switch
               checked={settings?.announceIntervalName ?? true}
@@ -523,11 +312,11 @@ export default function SettingsScreen() {
             />
           </View>
 
-          <View className="py-4 px-6 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <View className="w-4/5">
-                <Text className="text-lg">Announce time at start of timer</Text>
-              </View>
+          <View
+            className={`${ITEM_PADDING} flex-row items-center justify-between`}
+          >
+            <View className="flex-1">
+              <Text className="text-base">Announce time at start of timer</Text>
             </View>
             <Switch
               checked={settings?.announceTimeAtTimerStart ?? true}
@@ -541,6 +330,42 @@ export default function SettingsScreen() {
             />
           </View>
         </View>
+
+        {/* Timer Picker Modal */}
+        <TimerPickerModal
+          initialValue={{ minutes: 0 }}
+          visible={showSecondsRemainedPicker}
+          setIsVisible={setshowSecondsRemainedPicker}
+          onConfirm={(pickedDuration) => {
+            setSettings({
+              ...(settings as Settings),
+              countdownSoundSeconds: pickedDuration.seconds,
+            });
+            setshowSecondsRemainedPicker(false);
+          }}
+          padMinutesWithZero={false}
+          padSecondsWithZero={false}
+          hideHours={true}
+          hideMinutes={true}
+          modalTitle="Seconds"
+          onCancel={() => setshowSecondsRemainedPicker(false)}
+          closeOnOverlayPress
+          Audio={Audio}
+          LinearGradient={LinearGradient}
+          Haptics={Haptics}
+          styles={{
+            cancelButton: {
+              backgroundColor: PlatformColor('systemRed'),
+              color: 'white',
+              borderColor: PlatformColor('systemRed'),
+            },
+            confirmButton: {
+              backgroundColor: 'black',
+              color: 'white',
+              borderColor: 'black',
+            },
+          }}
+        />
       </ScrollView>
     </SafeAreaView>
   );
