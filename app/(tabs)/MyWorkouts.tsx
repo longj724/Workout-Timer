@@ -1,5 +1,5 @@
 // External Dependencies
-import { View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import React from 'react';
 import { useOAuth } from '@clerk/clerk-expo';
 import { useUser } from '@clerk/clerk-expo';
@@ -75,7 +75,7 @@ export default function MyWorkouts() {
   if (isLoading) {
     return (
       <View className="flex-1 bg-background p-4 items-center justify-center">
-        <Text>Loading workouts...</Text>
+        <ActivityIndicator size="large" color="gray" />
       </View>
     );
   }

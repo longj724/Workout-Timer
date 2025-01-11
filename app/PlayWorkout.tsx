@@ -6,6 +6,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Speech from 'expo-speech';
+import { Audio } from 'expo-av';
 
 // Internal Dependencies
 import { Interval, Timer } from '~/lib/types';
@@ -94,6 +95,34 @@ const PlayWorkout = () => {
     };
   }, [isPlaying, currentIntervalIndex, curRepetition]);
 
+  const completeWorkout = () => {
+    // Calculate final workout stats
+    const totalTime = intervals.reduce((acc, interval) => {
+      const intervalTime = interval.timers.reduce(
+        (timerAcc, timer) => timerAcc + (timer.minutes * 60 + timer.seconds),
+        0
+      );
+      return acc + intervalTime * interval.repetitions;
+    }, 0);
+
+    router.push({
+      pathname: '/WorkoutComplete',
+      params: {
+        stats: JSON.stringify({
+          // Total Time in seconds
+          totalTime,
+          totalIntervals: intervals.length,
+          totalRepetitions: intervals.reduce(
+            (acc, interval) => acc + interval.repetitions,
+            0
+          ),
+        }),
+        workoutId: workoutId || null,
+        intervals: JSON.stringify(intervals),
+      },
+    });
+  };
+
   const handleComplete = () => {
     // If there is another timer in the current interval
     if (curTimerIndex < curTimers.length - 1) {
@@ -114,39 +143,16 @@ const PlayWorkout = () => {
           setKey(`${currentIntervalIndex + 1},0,1`);
           setCurrentIntervalIndex((prev) => prev + 1);
         } else {
-          // Calculate final workout stats
-          const totalTime = intervals.reduce((acc, interval) => {
-            const intervalTime = interval.timers.reduce(
-              (timerAcc, timer) =>
-                timerAcc + (timer.minutes * 60 + timer.seconds),
-              0
-            );
-            return acc + intervalTime * interval.repetitions;
-          }, 0);
-
-          router.push({
-            pathname: '/WorkoutComplete',
-            params: {
-              stats: JSON.stringify({
-                // Total Time in seconds
-                totalTime,
-                totalIntervals: intervals.length,
-                totalRepetitions: intervals.reduce(
-                  (acc, interval) => acc + interval.repetitions,
-                  0
-                ),
-              }),
-              workoutId: workoutId || null,
-              intervals: JSON.stringify(intervals),
-            },
-          });
+          completeWorkout();
         }
       }
     }
   };
 
   const handleNext = useCallback(() => {
-    if (currentIntervalIndex < intervals.length - 1) {
+    if (currentIntervalIndex === intervals.length - 1) {
+      completeWorkout();
+    } else {
       setCurrentIntervalIndex((prev) => prev + 1);
       setKey(`${currentIntervalIndex + 1},0,1`);
     }
@@ -233,13 +239,27 @@ const PlayWorkout = () => {
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <CountdownCircleTimer
-          onUpdate={(remainingTime) => {
+          onUpdate={async (remainingTime) => {
             if (
               settings?.countdownSoundSeconds &&
               settings?.countdownSoundSeconds >= remainingTime &&
-              remainingTime !== 0
+              settings?.countdownSoundType !== 'none'
             ) {
-              Speech.speak(remainingTime.toString());
+              if (settings?.countdownSoundType === 'beeps') {
+                if (remainingTime === 0) {
+                  const { sound } = await Audio.Sound.createAsync(
+                    require('../assets/countdown-sport-timer.wav')
+                  );
+                  await sound.playAsync();
+                } else {
+                  const { sound } = await Audio.Sound.createAsync(
+                    require('../assets/end-sport-timer.wav')
+                  );
+                  await sound.playAsync();
+                }
+              } else {
+                Speech.speak(remainingTime.toString());
+              }
             }
           }}
           key={key}
@@ -312,6 +332,10 @@ const PlayWorkout = () => {
               borderRadius: 15,
             }}
             className="flex flex-col items-center justify-center w-28 h-28 py-2"
+            disabled={
+              intervals[currentIntervalIndex].timers.length - 1 ===
+              curTimerIndex
+            }
           >
             <AntDesign name="stepforward" size={28} color="#fff" />
             <Text className="text-md text-white font-semibold">NEXT</Text>
@@ -341,8 +365,16 @@ const PlayWorkout = () => {
             className="flex flex-col items-center justify-center py-2 w-28 h-28"
           >
             <AntDesign name="forward" size={28} color="#fff" />
-            <Text className="text-md text-white font-semibold">NEXT</Text>
-            <Text className="text-md text-white font-semibold">INTERVAL</Text>
+            <Text className="text-md text-white font-semibold">
+              {currentIntervalIndex === intervals.length - 1
+                ? 'FINISH'
+                : 'NEXT'}
+            </Text>
+            <Text className="text-md text-white font-semibold">
+              {currentIntervalIndex === intervals.length - 1
+                ? 'WORKOUT'
+                : 'INTERVAL'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
