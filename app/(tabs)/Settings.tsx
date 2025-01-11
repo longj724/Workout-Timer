@@ -1,13 +1,14 @@
 // External Dependencies
 import { useEffect, useState } from 'react';
 import {
-  View,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView,
+  Image,
   PlatformColor,
   Pressable,
-  Image,
+  SafeAreaView,
+  ScrollView,
+  Switch,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import {
   ChevronRight,
@@ -28,7 +29,7 @@ import * as Speech from 'expo-speech';
 
 // Internal Dependencies
 import { Text } from '~/components/ui/text';
-import { Switch } from '~/components/ui/switch';
+// import { Switch } from '~/components/ui/switch';
 import { useStorageMutation, useStorageQuery } from '~/hooks/useStorage';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { Settings, SoundType } from '~/lib/types';
@@ -117,11 +118,11 @@ export default function SettingsScreen() {
                       });
                     }}
                   >
-                    <Play size={24} color="#22c55e" />
+                    <Play size={24} color="#16a34a" />
                   </Pressable> */}
 
                   {settings?.selectedVoiceIdentifier === voice.identifier && (
-                    <Check size={24} color="#22c55e" />
+                    <Check size={24} color="#16a34a" />
                   )}
                 </Pressable>
               ))}
@@ -259,7 +260,7 @@ export default function SettingsScreen() {
             >
               <Text className="text-base">{option.label}</Text>
               {settings?.countdownSoundType === option.value.toLowerCase() && (
-                <Check size={24} color="#22c55e" />
+                <Check size={24} color="#16a34a" />
               )}
             </Pressable>
           ))}
@@ -301,8 +302,12 @@ export default function SettingsScreen() {
               <Text className="text-base">Announce interval name at start</Text>
             </View>
             <Switch
-              checked={settings?.announceIntervalName ?? true}
-              onCheckedChange={(checked: boolean) => {
+              trackColor={{
+                true: '#FF7F50',
+                false: '#9CA3AF',
+              }}
+              value={settings?.announceIntervalName ?? true}
+              onValueChange={(checked: boolean) => {
                 setSettings({
                   ...(settings as Settings),
                   announceIntervalName: checked,
@@ -319,8 +324,12 @@ export default function SettingsScreen() {
               <Text className="text-base">Announce time at start of timer</Text>
             </View>
             <Switch
-              checked={settings?.announceTimeAtTimerStart ?? true}
-              onCheckedChange={(checked: boolean) => {
+              trackColor={{
+                true: '#FF7F50',
+                false: '#9CA3AF',
+              }}
+              value={settings?.announceTimeAtTimerStart ?? true}
+              onValueChange={(checked: boolean) => {
                 setSettings({
                   ...(settings as Settings),
                   announceTimeAtTimerStart: checked,
