@@ -95,6 +95,19 @@ const PlayWorkout = () => {
     };
   }, [isPlaying, currentIntervalIndex, curRepetition]);
 
+  useEffect(() => {
+    if (settings?.announceTimeAtTimerStart && curTimerTotalSeconds !== 0) {
+      const minutes = Math.floor(curTimerTotalSeconds / 60);
+      const seconds = curTimerTotalSeconds % 60;
+
+      if (minutes > 0) {
+        Speech.speak(`Next round is ${minutes} minutes, ${seconds} seconds`);
+      } else {
+        Speech.speak(`Next round is ${seconds} seconds`);
+      }
+    }
+  }, [curTimerTotalSeconds]);
+
   const completeWorkout = () => {
     // Calculate final workout stats
     const totalTime = intervals.reduce((acc, interval) => {
@@ -123,7 +136,7 @@ const PlayWorkout = () => {
     });
   };
 
-  const handleComplete = () => {
+  const handleCompleteTimer = () => {
     // If there is another timer in the current interval
     if (curTimerIndex < curTimers.length - 1) {
       setCurTimerIndex((prev) => prev + 1);
@@ -149,7 +162,7 @@ const PlayWorkout = () => {
     }
   };
 
-  const handleNext = useCallback(() => {
+  const handleNextInterval = useCallback(() => {
     if (currentIntervalIndex === intervals.length - 1) {
       completeWorkout();
     } else {
@@ -243,7 +256,8 @@ const PlayWorkout = () => {
             if (
               settings?.countdownSoundSeconds &&
               settings?.countdownSoundSeconds >= remainingTime &&
-              settings?.countdownSoundType !== 'none'
+              settings?.countdownSoundType !== 'none' &&
+              curTimerTotalSeconds !== remainingTime
             ) {
               if (settings?.countdownSoundType === 'beeps') {
                 if (remainingTime === 0) {
@@ -275,7 +289,7 @@ const PlayWorkout = () => {
           size={280}
           strokeWidth={20}
           trailColor="rgba(255,255,255,0.3)"
-          onComplete={handleComplete}
+          onComplete={handleCompleteTimer}
         >
           {({ remainingTime }) => (
             <View className="flex items-center">
@@ -357,7 +371,7 @@ const PlayWorkout = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={handleNext}
+            onPress={handleNextInterval}
             style={{
               backgroundColor: 'rgba(255,255,255,0.2)',
               borderRadius: 15,
