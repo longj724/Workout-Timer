@@ -108,6 +108,16 @@ const PlayWorkout = () => {
     }
   }, [curTimerTotalSeconds]);
 
+  useEffect(() => {
+    if (settings?.announceIntervalName && curTimerTotalSeconds !== 0) {
+      if (intervals[currentIntervalIndex].name) {
+        Speech.speak(
+          `Starting interval ${intervals[currentIntervalIndex].name}`
+        );
+      }
+    }
+  }, [currentIntervalIndex]);
+
   const completeWorkout = () => {
     // Calculate final workout stats
     const totalTime = intervals.reduce((acc, interval) => {
