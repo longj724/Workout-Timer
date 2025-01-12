@@ -72,7 +72,7 @@ export default function Home() {
       </Pressable>
 
       <Pressable
-        className="bg-primary rounded-lg p-4 mt-auto flex-row justify-between"
+        className="bg-primary rounded-lg p-4 mt-auto flex-row justify-between dark:bg-gray-700"
         onPress={() =>
           router.push({
             pathname: '/PlayWorkout',
@@ -81,10 +81,10 @@ export default function Home() {
         }
         disabled={intervals?.length === 0}
       >
-        <Text className="text-primary-foreground text-xl font-semibold">
+        <Text className="text-primary-foreground text-xl font-semibold dark:text-white">
           Start Workout
         </Text>
-        <Text className="text-primary-foreground text-xl font-semibold mr-2">
+        <Text className="text-primary-foreground text-xl font-semibold mr-2 dark:text-white">
           {calculateTotalTime()}
         </Text>
       </Pressable>

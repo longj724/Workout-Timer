@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import { BottomSheet } from '~/components/ui/bottom-sheet';
 import { Interval, Timer } from '~/lib/types';
 import { useStorageMutation, useStorageQuery } from '~/hooks/useStorage';
+import { useColorScheme } from 'react-native';
 
 interface IntervalItemProps {
   id: string;
@@ -24,6 +25,7 @@ export function IntervalItem({
   repetitions,
   order,
 }: IntervalItemProps) {
+  const isDarkColorScheme = useColorScheme() === 'dark';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const { data: intervals } = useStorageQuery<Interval[]>('intervals', []);
@@ -40,7 +42,7 @@ export function IntervalItem({
 
   return (
     <>
-      <View className="bg-card rounded-lg p-4 mb-4 shadow-md shadow-foreground/10">
+      <View className="bg-card rounded-lg p-4 mb-4 shadow-md shadow-foreground/10 dark:bg-gray-700">
         <View className="flex-row justify-between items-center">
           <View className="flex-col gap-1">
             <View className="flex-row items-center gap-2">
@@ -63,7 +65,11 @@ export function IntervalItem({
             onPress={() => setIsMenuOpen(true)}
             className="w-10 h-10 items-center justify-center"
           >
-            <Ionicons name="ellipsis-horizontal" size={24} color="#666" />
+            <Ionicons
+              name="ellipsis-horizontal"
+              size={24}
+              color={isDarkColorScheme ? '#9ca3af' : '#71717a'}
+            />
           </Pressable>
         </View>
       </View>
@@ -86,7 +92,12 @@ export function IntervalItem({
             }}
             className="flex-row items-center py-4 border-b border-muted"
           >
-            <Ionicons name="pencil" size={24} color="#666" className="mr-3" />
+            <Ionicons
+              name="pencil"
+              size={24}
+              color={isDarkColorScheme ? '#9ca3af' : '#71717a'}
+              className="mr-3"
+            />
             <Text className="text-foreground text-lg">Edit Interval</Text>
           </Pressable>
 

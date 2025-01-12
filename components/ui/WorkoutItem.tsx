@@ -9,12 +9,14 @@ import { Text } from '~/components/ui/text';
 import { BottomSheet } from '~/components/ui/bottom-sheet';
 import { WorkoutWithRelations } from '~/lib/types';
 import { useDeleteWorkout } from '~/hooks/useDeleteWorkout';
+import { useColorScheme } from '~/lib/useColorScheme';
 
 interface WorkoutItemProps {
   workout: WorkoutWithRelations;
 }
 
 export function WorkoutItem({ workout }: WorkoutItemProps) {
+  const { isDarkColorScheme } = useColorScheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const deleteWorkout = useDeleteWorkout();
@@ -86,7 +88,11 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
           }
           className="w-10 h-10 items-center justify-center"
         >
-          <Ionicons name="pencil" size={18} color="#666" />
+          <Ionicons
+            name="pencil"
+            size={18}
+            color={isDarkColorScheme ? '#9ca3af' : '#71717a'}
+          />
         </Pressable>
       </View>
     ));
@@ -94,12 +100,12 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
 
   return (
     <>
-      <View className="bg-card rounded-lg px-4 pt-4 mb-4 shadow-md shadow-foreground/10">
+      <View className="bg-card rounded-lg px-4 pt-4 mb-4 shadow-md shadow-foreground/10 dark:bg-gray-700">
         <View className="flex-row justify-between items-center">
           <View className="flex-col flex-1">
             <Text className="text-lg font-semibold">{workout.name}</Text>
             <View className="flex-row mt-2 gap-4">
-              <Text className="text-muted-foreground">
+              <Text className="text-foreground/60">
                 Total Time: {calculateTotalTime()}
               </Text>
             </View>
@@ -109,7 +115,11 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
             onPress={() => setIsMenuOpen(true)}
             className="w-10 h-10 items-center justify-center"
           >
-            <Ionicons name="ellipsis-horizontal" size={24} color="#666" />
+            <Ionicons
+              name="ellipsis-horizontal"
+              size={24}
+              color={isDarkColorScheme ? '#9ca3af' : '#71717a'}
+            />
           </Pressable>
         </View>
 
@@ -120,7 +130,7 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
           <Ionicons
             name={isExpanded ? 'chevron-up' : 'chevron-down'}
             size={24}
-            color="#666"
+            color={isDarkColorScheme ? '#9ca3af' : '#71717a'}
           />
         </Pressable>
 
@@ -130,7 +140,7 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
       </View>
 
       <BottomSheet isVisible={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
-        <View className="p-4 pb-8">
+        <View className="p-4 pb-8 dark:bg-gray-700">
           <Pressable
             onPress={() => {
               setIsMenuOpen(false);
@@ -141,16 +151,30 @@ export function WorkoutItem({ workout }: WorkoutItemProps) {
             }}
             className="flex-row items-center py-4 border-b border-muted"
           >
-            <Ionicons name="play" size={24} color="#666" className="mr-3" />
-            <Text className="text-foreground text-lg">Start Workout</Text>
+            <Ionicons
+              name="play"
+              size={24}
+              color={isDarkColorScheme ? '#FFF' : '#4b5563'}
+              className="mr-3"
+            />
+            <Text className="text-lg text-gray-600 dark:text-white">
+              Start Workout
+            </Text>
           </Pressable>
 
           <Pressable
             onPress={handleDeleteWorkout}
             className="flex-row items-center py-4"
           >
-            <Ionicons name="trash" size={24} color="#dc2626" className="mr-3" />
-            <Text className="text-red-600 text-lg">Delete Workout</Text>
+            <Ionicons
+              name="trash"
+              size={24}
+              color={isDarkColorScheme ? '#ef4444' : '#dc2626'}
+              className="mr-3"
+            />
+            <Text className="text-red-600 dark:text-red-500 text-lg">
+              Delete Workout
+            </Text>
           </Pressable>
         </View>
       </BottomSheet>

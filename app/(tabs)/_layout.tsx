@@ -27,12 +27,14 @@ import { Input } from '~/components/ui/input';
 import { useStorageQuery } from '~/hooks/useStorage';
 import { useCreateWorkout } from '~/hooks/useCreateWorkout';
 import { Interval } from '~/lib/types';
+import { useColorScheme } from 'react-native';
 
 export default function TabLayout() {
   const { data: intervals } = useStorageQuery('intervals', []);
   const { mutate: createWorkout } = useCreateWorkout();
   const { user } = useUser();
   const [workoutName, setWorkoutName] = useState('');
+  const isDarkColorScheme = useColorScheme() === 'dark';
 
   const saveWorkout = () => {
     if (!intervals || intervals.length === 0) {
@@ -60,7 +62,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#FF7F50',
-        tabBarInactiveTintColor: '#666',
+        tabBarInactiveTintColor: isDarkColorScheme ? '#9ca3af' : '#71717a',
       }}
     >
       <Tabs.Screen
@@ -73,7 +75,10 @@ export default function TabLayout() {
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="bg-transparent">
-                    <Save size={24} color="#666" />
+                    <Save
+                      size={24}
+                      color={isDarkColorScheme ? '#9ca3af' : '#71717a'}
+                    />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="w-72">

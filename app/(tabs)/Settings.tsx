@@ -38,10 +38,10 @@ type SettingsView = 'main' | 'audio' | 'voice' | 'profile';
 
 // Add consistent spacing and styling
 const SECTION_SPACING = 'mx-4 mb-4';
-const SECTION_STYLE = 'bg-white rounded-lg shadow';
+const SECTION_STYLE = 'bg-white dark:bg-gray-700 rounded-lg shadow';
 const ITEM_PADDING = 'p-4';
 const ICON_CONTAINER = 'h-10 w-10 rounded-xl items-center justify-center';
-const SECTION_HEADER = 'text-xl ml-4 text-gray-500 mb-2';
+const SECTION_HEADER = 'text-xl ml-4 text-gray-500 dark:text-gray-400 mb-2';
 
 export default function SettingsScreen() {
   const { user } = useUser();
@@ -73,8 +73,8 @@ export default function SettingsScreen() {
         onPress={() => setCurrentView('main')}
         className="mr-3 flex flex-row items-center"
       >
-        <ArrowLeft size={24} color="#000" />
-        <Text className="text-xl ml-2">Back</Text>
+        <ArrowLeft size={24} color={isDarkColorScheme ? '#fff' : '#000'} />
+        <Text className="text-xl ml-2 dark:text-white">Back</Text>
       </TouchableOpacity>
     </View>
   );
@@ -83,7 +83,7 @@ export default function SettingsScreen() {
 
   if (currentView === 'audio') {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50">
+      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
         {renderHeader()}
       </SafeAreaView>
     );
@@ -91,11 +91,11 @@ export default function SettingsScreen() {
 
   if (currentView === 'voice') {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50">
+      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
         {renderHeader()}
-        <Text className="text-xl ml-4 text-gray-500 mb-2">Voice Selection</Text>
+        <Text className={SECTION_HEADER}>Voice Selection</Text>
         <ScrollView>
-          <View className="mx-2 bg-white rounded-lg shadow divide-y divide-gray-200">
+          <View className="mx-2 bg-white dark:bg-gray-700 rounded-lg shadow divide-y divide-gray-200 dark:divide-gray-700">
             {voices
               .filter((voice) => voice.language.includes('en'))
               .map((voice) => (
@@ -109,18 +109,7 @@ export default function SettingsScreen() {
                     });
                   }}
                 >
-                  <Text className="text-lg">{voice.name}</Text>
-                  {/* Button to play the voice */}
-                  {/* <Pressable
-                    onPress={() => {
-                      Speech.speak('Hello, world!', {
-                        voice: voice.identifier,
-                      });
-                    }}
-                  >
-                    <Play size={24} color="#16a34a" />
-                  </Pressable> */}
-
+                  <Text className="text-lg dark:text-white">{voice.name}</Text>
                   {settings?.selectedVoiceIdentifier === voice.identifier && (
                     <Check size={24} color="#16a34a" />
                   )}
@@ -134,13 +123,12 @@ export default function SettingsScreen() {
 
   if (currentView === 'profile') {
     return (
-      <SafeAreaView className="flex-1 bg-gray-50">
+      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
         {renderHeader()}
         <ScrollView>
-          {/* Profile Info */}
-          <View className="mx-4 bg-white rounded-lg shadow mb-4">
-            <View className="p-6 items-center border-b border-gray-200">
-              <View className="h-24 w-24 rounded-full bg-gray-200 items-center justify-center overflow-hidden mb-4">
+          <View className="mx-4 bg-white dark:bg-gray-700 rounded-lg shadow mb-4">
+            <View className="p-6 items-center border-b border-gray-200 dark:border-gray-700">
+              <View className="h-24 w-24 rounded-full bg-gray-200 dark:bg-gray-700 items-center justify-center overflow-hidden mb-4">
                 {user?.imageUrl ? (
                   <Image
                     source={{ uri: user.imageUrl }}
@@ -148,30 +136,33 @@ export default function SettingsScreen() {
                     resizeMode="cover"
                   />
                 ) : (
-                  <User size={40} color="#9CA3AF" />
+                  <User
+                    size={40}
+                    color={isDarkColorScheme ? '#fff' : '#9CA3AF'}
+                  />
                 )}
               </View>
-              <Text className="text-xl font-medium">
+              <Text className="text-xl font-medium dark:text-white">
                 {user?.fullName || user?.firstName || 'User'}
               </Text>
-              <Text className="text-gray-500 mt-1">
+              <Text className="text-gray-500 dark:text-gray-400 mt-1">
                 {user?.emailAddresses[0].emailAddress}
               </Text>
             </View>
 
-            {/* Account Details */}
-            <View className="divide-y divide-gray-200">
+            <View className="divide-y divide-gray-200 dark:divide-gray-700">
               <View className="p-4">
-                <Text className="text-sm text-gray-500 mb-1">Created</Text>
-                <Text className="text-base">
+                <Text className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                  Created
+                </Text>
+                <Text className="text-base dark:text-white">
                   {new Date(user?.createdAt || '').toLocaleDateString()}
                 </Text>
               </View>
             </View>
           </View>
 
-          {/* Account Actions */}
-          <View className="mx-4 bg-white rounded-lg shadow divide-y divide-gray-200">
+          <View className="mx-4 bg-white dark:bg-gray-700 rounded-lg shadow divide-y divide-gray-200 dark:divide-gray-700">
             <TouchableOpacity
               className="p-4 flex-row items-center"
               onPress={async () => {
@@ -183,10 +174,12 @@ export default function SettingsScreen() {
                 }
               }}
             >
-              <View className="h-10 w-10 rounded-xl bg-red-100 items-center justify-center">
+              <View className="h-10 w-10 rounded-xl bg-red-100 dark:bg-red-900 items-center justify-center">
                 <LogOut size={24} color="#DC2626" />
               </View>
-              <Text className="flex-1 ml-4 text-lg text-red-600">Sign Out</Text>
+              <Text className="flex-1 ml-4 text-lg text-red-600 dark:text-red-400">
+                Sign Out
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -196,7 +189,7 @@ export default function SettingsScreen() {
 
   // Main Settings View
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
       <ScrollView className="flex-1 pt-4">
         {/* User Profile Section */}
         {user && (
@@ -205,7 +198,7 @@ export default function SettingsScreen() {
               className={`${ITEM_PADDING} flex-row items-center`}
               onPress={() => setCurrentView('profile')}
             >
-              <View className="h-12 w-12 rounded-full bg-gray-200 items-center justify-center overflow-hidden">
+              <View className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700 items-center justify-center overflow-hidden">
                 {user.imageUrl ? (
                   <Image
                     source={{ uri: user.imageUrl }}
@@ -213,31 +206,50 @@ export default function SettingsScreen() {
                     resizeMode="cover"
                   />
                 ) : (
-                  <User size={24} color="#9CA3AF" />
+                  <User
+                    size={24}
+                    color={isDarkColorScheme ? '#fff' : '#9CA3AF'}
+                  />
                 )}
               </View>
               <View className="ml-4 flex-1">
-                <Text className="text-base font-medium">
+                <Text className="text-base font-medium dark:text-white">
                   {user.fullName || user.firstName || 'User'}
                 </Text>
-                <Text className="text-sm text-gray-500">
+                <Text className="text-sm text-gray-500 dark:text-gray-400">
                   {user.emailAddresses[0].emailAddress}
                 </Text>
               </View>
-              <ChevronRight size={20} color="#9CA3AF" />
+              <ChevronRight
+                size={20}
+                color={isDarkColorScheme ? '#9ca3af' : '#71717a'}
+              />
             </TouchableOpacity>
           </View>
         )}
 
-        {/* Review Section */}
-        <View className={`${SECTION_SPACING} ${SECTION_STYLE}`}>
-          <TouchableOpacity className={`${ITEM_PADDING} flex-row items-center`}>
-            <View className={`${ICON_CONTAINER} bg-amber-400`}>
-              <Star size={24} color="white" />
+        <View
+          className={`${SECTION_SPACING} ${SECTION_STYLE} ${
+            isAudioDisabled ? 'opacity-50' : ''
+          }`}
+        >
+          <View
+            className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100 dark:border-gray-700`}
+          >
+            <View className="flex-1">
+              <Text className="text-base dark:text-white">Dark Mode</Text>
             </View>
-            <Text className="flex-1 ml-4 text-base">Write Review</Text>
-            <ChevronRight size={20} color="#9CA3AF" />
-          </TouchableOpacity>
+            <Switch
+              trackColor={{
+                true: '#FF7F50',
+                false: isDarkColorScheme ? '#4B5563' : '#9CA3AF',
+              }}
+              value={isDarkColorScheme}
+              onValueChange={(checked: boolean) => {
+                setColorScheme(checked ? 'dark' : 'light');
+              }}
+            />
+          </View>
         </View>
 
         {/* Alert Type Section */}
@@ -250,7 +262,7 @@ export default function SettingsScreen() {
           ].map((option) => (
             <Pressable
               key={option.value}
-              className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100 last:border-b-0`}
+              className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100 dark:border-gray-700 last:border-b-0`}
               onPress={() =>
                 setSettings({
                   ...(settings as Settings),
@@ -258,7 +270,7 @@ export default function SettingsScreen() {
                 })
               }
             >
-              <Text className="text-base">{option.label}</Text>
+              <Text className="text-base dark:text-white">{option.label}</Text>
               {settings?.countdownSoundType === option.value.toLowerCase() && (
                 <Check size={24} color="#16a34a" />
               )}
@@ -274,21 +286,27 @@ export default function SettingsScreen() {
           }`}
         >
           <View
-            className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100`}
+            className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100 dark:border-gray-700`}
           >
             <View className="flex-1">
-              <Text className="text-base">Seconds Remaining</Text>
-              <Text className="text-sm text-gray-500">
+              <Text className="text-base dark:text-white">
+                Seconds Remaining
+              </Text>
+              <Text className="text-sm text-gray-500 dark:text-gray-400">
                 Select seconds remaining to start countdown
               </Text>
             </View>
             <Pressable
-              className="bg-gray-100 px-4 rounded-md flex items-center justify-center h-9"
+              className="bg-gray-100 dark:bg-gray-600 px-4 rounded-md flex items-center justify-center h-9"
               onPress={() => setshowSecondsRemainedPicker(true)}
               disabled={isAudioDisabled}
             >
               <Text
-                className={isAudioDisabled ? 'text-gray-400' : 'text-green-500'}
+                className={
+                  isAudioDisabled
+                    ? 'text-gray-400'
+                    : 'text-green-600 dark:text-green-400'
+                }
               >
                 {settings?.countdownSoundSeconds} sec
               </Text>
@@ -296,10 +314,12 @@ export default function SettingsScreen() {
           </View>
 
           <View
-            className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100`}
+            className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100 dark:border-gray-700`}
           >
             <View className="flex-1">
-              <Text className="text-base">Announce interval name at start</Text>
+              <Text className="text-base dark:text-white">
+                Announce interval name at start
+              </Text>
             </View>
             <Switch
               trackColor={{
@@ -318,10 +338,12 @@ export default function SettingsScreen() {
           </View>
 
           <View
-            className={`${ITEM_PADDING} flex-row items-center justify-between`}
+            className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100 dark:border-gray-700`}
           >
             <View className="flex-1">
-              <Text className="text-base">Announce time at start of timer</Text>
+              <Text className="text-base dark:text-white">
+                Announce time at start of timer
+              </Text>
             </View>
             <Switch
               trackColor={{

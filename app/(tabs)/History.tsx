@@ -12,6 +12,7 @@ import { useUser } from '@clerk/clerk-expo';
 import { useGetCompletedWorkouts } from '~/hooks/useGetCompletedWorkouts';
 import { Ionicons } from '@expo/vector-icons';
 import { CompletedWorkout } from '~/lib/types';
+import { useColorScheme } from 'react-native';
 
 const calculateTotalMinutes = (
   hours: number,
@@ -20,6 +21,7 @@ const calculateTotalMinutes = (
 ) => hours * 60.0 + minutes + seconds / 60.0;
 
 const History = () => {
+  const isDarkColorScheme = useColorScheme() === 'dark';
   const { user } = useUser();
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -152,16 +154,32 @@ const History = () => {
       <Text className="text-2xl font-bold mb-4">My Workouts</Text>
 
       <View className="flex-row items-center justify-between mb-4 w-full">
-        <Button variant="outline" onPress={() => navigateWeek('prev')}>
-          <Ionicons name="arrow-back" size={16} />
+        <Button
+          variant="outline"
+          onPress={() => navigateWeek('prev')}
+          className="dark:bg-gray-700"
+        >
+          <Ionicons
+            name="arrow-back"
+            size={16}
+            color={isDarkColorScheme ? '#9ca3af' : 'black'}
+          />
         </Button>
 
         <Text className="text-lg">
           {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
         </Text>
 
-        <Button variant="outline" onPress={() => navigateWeek('next')}>
-          <Ionicons name="arrow-forward" size={16} />
+        <Button
+          variant="outline"
+          onPress={() => navigateWeek('next')}
+          className="dark:bg-gray-700"
+        >
+          <Ionicons
+            name="arrow-forward"
+            size={16}
+            color={isDarkColorScheme ? '#9ca3af' : 'black'}
+          />
         </Button>
       </View>
 
@@ -194,7 +212,7 @@ const History = () => {
           {completedWorkouts.map((workout) => (
             <View
               key={workout.id}
-              className="bg-card p-4 rounded-lg mb-3 border border-border"
+              className="bg-card p-4 rounded-lg mb-3 border border-border dark:bg-gray-700"
             >
               <Text className="text-muted-foreground">
                 {format(
