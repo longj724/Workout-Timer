@@ -90,7 +90,6 @@ export default function MyWorkouts() {
 
   return (
     <View className="flex-1 bg-background p-4">
-      <Text className="text-2xl font-bold mb-4">My Workouts</Text>
       {workouts?.length === 0 ? (
         <Text className="text-muted-foreground text-center">
           You haven't created any workouts yet

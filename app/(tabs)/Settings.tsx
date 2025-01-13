@@ -53,6 +53,7 @@ export default function SettingsScreen() {
     announceIntervalName: true,
     announceTimeAtTimerStart: true,
     selectedVoiceIdentifier: 'com.apple.ttsbundle.siri_female_en-US_compact',
+    isDarkMode: false,
   });
   const { mutate: setSettings } = useStorageMutation<Settings>('settings');
 
@@ -234,7 +235,7 @@ export default function SettingsScreen() {
           }`}
         >
           <View
-            className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100 dark:border-gray-700`}
+            className={`${ITEM_PADDING} flex-row items-center justify-between dark:border-gray-700`}
           >
             <View className="flex-1">
               <Text className="text-base dark:text-white">Dark Mode</Text>
@@ -244,9 +245,13 @@ export default function SettingsScreen() {
                 true: '#FF7F50',
                 false: isDarkColorScheme ? '#4B5563' : '#9CA3AF',
               }}
-              value={isDarkColorScheme}
+              value={settings?.isDarkMode}
               onValueChange={(checked: boolean) => {
                 setColorScheme(checked ? 'dark' : 'light');
+                setSettings({
+                  ...(settings as Settings),
+                  isDarkMode: checked,
+                });
               }}
             />
           </View>
@@ -338,7 +343,7 @@ export default function SettingsScreen() {
           </View>
 
           <View
-            className={`${ITEM_PADDING} flex-row items-center justify-between border-b border-gray-100 dark:border-gray-700`}
+            className={`${ITEM_PADDING} flex-row items-center justify-between dark:border-gray-700`}
           >
             <View className="flex-1">
               <Text className="text-base dark:text-white">

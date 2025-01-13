@@ -75,7 +75,7 @@ export function IntervalItem({
       </View>
 
       <BottomSheet isVisible={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
-        <View className="p-4 pb-8">
+        <View className="p-4 pb-8 dark:bg-gray-700">
           <Pressable
             onPress={() => {
               setIsMenuOpen(false);
@@ -98,7 +98,9 @@ export function IntervalItem({
               color={isDarkColorScheme ? '#9ca3af' : '#71717a'}
               className="mr-3"
             />
-            <Text className="text-foreground text-lg">Edit Interval</Text>
+            <Text className="text-lg text-gray-600 dark:text-white">
+              Edit Interval
+            </Text>
           </Pressable>
 
           <Pressable
@@ -108,8 +110,15 @@ export function IntervalItem({
             }}
             className="flex-row items-center py-4"
           >
-            <Ionicons name="trash" size={24} color="#dc2626" className="mr-3" />
-            <Text className="text-red-600 text-lg">Delete Interval</Text>
+            <Ionicons
+              name="trash"
+              size={24}
+              color={isDarkColorScheme ? '#ef4444' : '#dc2626'}
+              className="mr-3"
+            />
+            <Text className="text-red-600 dark:text-red-500 text-lg">
+              Delete Interval
+            </Text>
           </Pressable>
         </View>
       </BottomSheet>

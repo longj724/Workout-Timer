@@ -110,6 +110,7 @@ export type Settings = {
   announceIntervalName: boolean;
   announceTimeAtTimerStart: boolean;
   selectedVoiceIdentifier: string;
+  isDarkMode: boolean;
 };
 
 export type CompletedWorkout = {

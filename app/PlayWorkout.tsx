@@ -22,6 +22,7 @@ const PlayWorkout = () => {
     announceIntervalName: true,
     announceTimeAtTimerStart: true,
     selectedVoiceIdentifier: 'com.apple.ttsbundle.siri_female_en-US_compact',
+    isDarkMode: false,
   });
 
   const { intervalInfo, workoutId } = useLocalSearchParams<{
@@ -242,13 +243,7 @@ const PlayWorkout = () => {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: '#FF7F50', // Coral color similar to the image
-        padding: 20,
-      }}
-    >
+    <View className="flex-1 bg-[#FF7F50] dark:bg-gray-700 p-5">
       <TouchableOpacity
         style={{
           right: 20,
@@ -369,6 +364,7 @@ const PlayWorkout = () => {
           <TouchableOpacity
             onPress={handlePlayPause}
             style={{
+              backgroundColor: 'rgba(255,255,255,0.2)',
               borderRadius: 15,
             }}
             className="flex w-28 py-2 h-28 items-center justify-center bg-white"
@@ -376,7 +372,7 @@ const PlayWorkout = () => {
             <AntDesign
               name={isPlaying ? 'pause' : 'caretright'}
               size={28}
-              color="#FF7F50"
+              color={'#fff'}
             />
           </TouchableOpacity>
 

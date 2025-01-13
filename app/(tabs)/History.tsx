@@ -151,7 +151,7 @@ const History = () => {
 
   return (
     <View className="flex-1 bg-background p-4">
-      <Text className="text-2xl font-bold mb-4">My Workouts</Text>
+      {/* <Text className="text-2xl font-bold mb-4">My Workouts</Text> */}
 
       <View className="flex-row items-center justify-between mb-4 w-full">
         <Button

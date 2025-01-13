@@ -17,9 +17,9 @@ import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 // Internal Dependencies
 import { NAV_THEME } from '~/lib/constants';
 import { useColorScheme } from '~/lib/useColorScheme';
-import { ThemeToggle } from '~/components/ThemeToggle';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
 import { tokenCache } from '~/lib/cache';
+import { ThemeToggle } from '~/components/ThemeToggle';
 import '~/global.css';
 
 const LIGHT_THEME: Theme = {
@@ -89,19 +89,10 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const router = useRouter();
-  const { isLoaded, isSignedIn } = useAuth();
-
-  // useEffect(() => {
-  //   if (isLoaded && !isSignedIn) {
-  //     router.push('/(modals)/Login');
-  //   } else {
-  //     router.push('/(tabs)');
-  //   }
-  // }, [isLoaded]);
+  const { isDarkColorScheme } = useColorScheme();
 
   return (
     <Stack>
-      <Stack.Screen name="(modals)/Login" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
         name="(modals)/AddInterval"
@@ -109,7 +100,7 @@ function RootLayoutNav() {
           gestureEnabled: false,
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()}>
-              <Text>Cancel</Text>
+              <Text className="dark:text-white">Cancel</Text>
             </TouchableOpacity>
           ),
           presentation: 'modal',
@@ -119,6 +110,9 @@ function RootLayoutNav() {
       <Stack.Screen
         name="(modals)/EditInterval"
         options={{
+          headerStyle: {
+            backgroundColor: isDarkColorScheme ? '#374151' : 'white',
+          },
           gestureEnabled: false,
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()}>

@@ -17,8 +17,10 @@ import { Interval, Timer } from '~/lib/types';
 import { useStorageMutation, useStorageQuery } from '~/hooks/useStorage';
 import { useEditInterval } from '~/hooks/useEditInterval';
 import { EditIntervalInput, editIntervalSchema } from '~/lib/types';
+import { useColorScheme } from '~/lib/useColorScheme';
 
 const EditInterval = () => {
+  const { isDarkColorScheme } = useColorScheme();
   const { data: localIntervals } = useStorageQuery<Interval[]>('intervals', []);
   const { mutate: setIntervals } = useStorageMutation<Interval[]>('intervals');
   const { mutate: editInterval } = useEditInterval();
@@ -103,7 +105,7 @@ const EditInterval = () => {
   };
 
   return (
-    <View className="flex-1 bg-background p-4">
+    <View className="flex-1 p-4 dark:bg-gray-700">
       <ScrollView>
         <Text className="text-xl font-bold mb-4">Edit Interval</Text>
 
