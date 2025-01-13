@@ -97,20 +97,28 @@ const PlayWorkout = () => {
   }, [isPlaying, currentIntervalIndex, curRepetition]);
 
   useEffect(() => {
-    if (settings?.announceTimeAtTimerStart && curTimerTotalSeconds !== 0) {
+    if (
+      settings?.announceTimeAtTimerStart &&
+      curTimerTotalSeconds !== 0 &&
+      settings?.countdownSoundType !== 'none'
+    ) {
       const minutes = Math.floor(curTimerTotalSeconds / 60);
       const seconds = curTimerTotalSeconds % 60;
 
       if (minutes > 0) {
-        Speech.speak(`Next round is ${minutes} minutes, ${seconds} seconds`);
+        Speech.speak(`Next timer is ${minutes} minutes, ${seconds} seconds`);
       } else {
-        Speech.speak(`Next round is ${seconds} seconds`);
+        Speech.speak(`Next timer is ${seconds} seconds`);
       }
     }
   }, [curTimerTotalSeconds]);
 
   useEffect(() => {
-    if (settings?.announceIntervalName && curTimerTotalSeconds !== 0) {
+    if (
+      settings?.announceIntervalName &&
+      curTimerTotalSeconds !== 0 &&
+      settings?.countdownSoundType !== 'none'
+    ) {
       if (intervals[currentIntervalIndex].name) {
         Speech.speak(
           `Starting interval ${intervals[currentIntervalIndex].name}`
@@ -255,7 +263,7 @@ const PlayWorkout = () => {
         <AntDesign name="close" size={28} color="#fff" />
       </TouchableOpacity>
 
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <View className="flex-1 items-center justify-center">
         <CountdownCircleTimer
           onUpdate={async (remainingTime) => {
             if (
@@ -314,7 +322,6 @@ const PlayWorkout = () => {
         >
           <View className="w-full flex flex-row items-center justify-between">
             <View className="flex items-center">
-              {/* Intervals */}
               <Text className="text-2xl text-white font-bold">
                 {`${currentIntervalIndex + 1} / ${intervals.length}`}
               </Text>
@@ -323,8 +330,7 @@ const PlayWorkout = () => {
               </Text>
             </View>
 
-            {/* Remaining */}
-            <View className="flex items-center">
+            <View className="flex-col items-center justify-center mr-5">
               <Text className="text-2xl text-white font-bold">
                 {formatTotalTime(totalRemainingSeconds)}
               </Text>
@@ -333,12 +339,11 @@ const PlayWorkout = () => {
               </Text>
             </View>
 
-            {/* Rounds */}
-            <View className="flex items-center">
+            <View className="flex-col items-center justify-center">
               <Text className="text-2xl text-white font-bold">
                 {`${curRepetition} / ${intervals[currentIntervalIndex].repetitions}`}
               </Text>
-              <Text className="text-md text-white font-semibold">ROUNDS</Text>
+              <Text className="text-md text-white font-semibold">TIMERS</Text>
             </View>
           </View>
         </Card>

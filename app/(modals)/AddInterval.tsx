@@ -104,7 +104,7 @@ const AddInterval = () => {
   };
 
   return (
-    <View className="flex-1 bg-background p-4">
+    <View className="flex-1 bg-background p-4 dark:bg-black">
       <ScrollView>
         <Text className="text-xl font-bold mb-4">Add New Interval</Text>
 
@@ -139,8 +139,8 @@ const AddInterval = () => {
             </View>
           ))}
 
-          <Button className="mt-2" onPress={handleAddTimer}>
-            <Text>Add Timer</Text>
+          <Button className="mt-2 dark:bg-gray-700" onPress={handleAddTimer}>
+            <Text className="dark:text-white">Add Timer</Text>
           </Button>
         </View>
 
@@ -151,11 +151,12 @@ const AddInterval = () => {
             value={repetitions}
             onChangeText={setRepetitions}
             placeholder="Number of repetitions"
+            className="dark:text-white"
           />
         </View>
 
-        <Button onPress={handleSubmit} className="mt-4">
-          <Text>Add Interval</Text>
+        <Button onPress={handleSubmit} className="mt-4 dark:bg-gray-700">
+          <Text className="dark:text-white">Add Interval</Text>
         </Button>
       </ScrollView>
 

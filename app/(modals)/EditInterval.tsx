@@ -105,13 +105,18 @@ const EditInterval = () => {
   };
 
   return (
-    <View className="flex-1 p-4 dark:bg-gray-700">
+    <View className="flex-1 p-4">
       <ScrollView>
         <Text className="text-xl font-bold mb-4">Edit Interval</Text>
 
         <View className="mb-4">
           <Text className="font-semibold mb-2">Name (Optional)</Text>
-          <Input value={name} onChangeText={setName} placeholder="Name" />
+          <Input
+            value={name}
+            onChangeText={setName}
+            placeholder="Name"
+            className="dark:text-white"
+          />
         </View>
 
         <View className="mb-4">
@@ -126,7 +131,9 @@ const EditInterval = () => {
                   setShowTimerPicker(true);
                 }}
               >
-                <Text>{`${minutes}:${String(seconds).padStart(2, '0')}`}</Text>
+                <Text className="text-black dark:text-white">{`${minutes}:${String(
+                  seconds
+                ).padStart(2, '0')}`}</Text>
               </Button>
 
               <Button
@@ -140,8 +147,8 @@ const EditInterval = () => {
             </View>
           ))}
 
-          <Button className="mt-2" onPress={handleAddTimer}>
-            <Text>Add Timer</Text>
+          <Button className="mt-2 dark:bg-gray-700" onPress={handleAddTimer}>
+            <Text className="dark:text-white">Add Timer</Text>
           </Button>
         </View>
 
@@ -152,11 +159,12 @@ const EditInterval = () => {
             value={repetitions}
             onChangeText={setRepetitions}
             placeholder="Number of repetitions"
+            className="dark:text-white"
           />
         </View>
 
-        <Button onPress={handleSubmit} className="mt-4">
-          <Text>Save Changes</Text>
+        <Button onPress={handleSubmit} className="mt-4 dark:bg-gray-700">
+          <Text className="dark:text-white">Save Changes</Text>
         </Button>
       </ScrollView>
 

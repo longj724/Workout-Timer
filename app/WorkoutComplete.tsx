@@ -63,7 +63,7 @@ const WorkoutComplete = () => {
       <Stack.Screen options={{ headerShown: false }} />
       <View className="flex-1">
         {/* Top half */}
-        <View className="h-1/2 w-full bg-[#FF7F50] flex items-center justify-center">
+        <View className="h-1/2 w-full bg-[#FF7F50] dark:bg-gray-700 flex items-center justify-center">
           <View className="items-center justify-center">
             <Text className="text-white text-4xl font-bold mb-4">
               Workout Complete!
@@ -100,9 +100,7 @@ const WorkoutComplete = () => {
             </View>
           </View>
 
-          {/* Done button */}
           <Button
-            // variant="outline"
             className="w-full bg-[#FF7F50]"
             size="lg"
             onPress={handleFinishWorkout}

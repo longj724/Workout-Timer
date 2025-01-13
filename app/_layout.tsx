@@ -97,6 +97,9 @@ function RootLayoutNav() {
       <Stack.Screen
         name="(modals)/AddInterval"
         options={{
+          headerStyle: {
+            backgroundColor: isDarkColorScheme ? 'black' : 'white',
+          },
           gestureEnabled: false,
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()}>
@@ -111,12 +114,12 @@ function RootLayoutNav() {
         name="(modals)/EditInterval"
         options={{
           headerStyle: {
-            backgroundColor: isDarkColorScheme ? '#374151' : 'white',
+            backgroundColor: isDarkColorScheme ? 'black' : 'white',
           },
           gestureEnabled: false,
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()}>
-              <Text>Cancel</Text>
+              <Text className="dark:text-white">Cancel</Text>
             </TouchableOpacity>
           ),
           presentation: 'modal',
@@ -128,11 +131,6 @@ function RootLayoutNav() {
         options={{
           title: 'Play Workout',
           headerShown: false,
-          // headerLeft: () => (
-          //   <TouchableOpacity onPress={() => router.back()}>
-          //     <Text>Cancel</Text>
-          //   </TouchableOpacity>
-          // ),
         }}
       />
       <Stack.Screen

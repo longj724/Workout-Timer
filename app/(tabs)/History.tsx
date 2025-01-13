@@ -95,8 +95,8 @@ const History = () => {
   };
 
   const chartConfig = {
-    backgroundGradientFrom: '#ffffff',
-    backgroundGradientTo: '#ffffff',
+    backgroundGradientFrom: isDarkColorScheme ? '#d1d5db' : '#ffffff',
+    backgroundGradientTo: isDarkColorScheme ? '#d1d5db' : '#ffffff',
     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     strokeWidth: 2,
     barPercentage: 0.7,
@@ -151,8 +151,6 @@ const History = () => {
 
   return (
     <View className="flex-1 bg-background p-4">
-      {/* <Text className="text-2xl font-bold mb-4">My Workouts</Text> */}
-
       <View className="flex-row items-center justify-between mb-4 w-full">
         <Button
           variant="outline"
