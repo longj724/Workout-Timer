@@ -194,13 +194,6 @@ const PlayWorkout = () => {
     setIsPlaying((prev) => !prev);
   };
 
-  const handleNextTimer = () => {
-    if (curTimerIndex < curTimers.length - 1) {
-      setCurTimerIndex((prev) => prev + 1);
-      setKey(`${currentIntervalIndex},${curTimerIndex + 1},${curRepetition}`);
-    }
-  };
-
   const formatTime = (remainingTime: number) => {
     const minutes = Math.floor(remainingTime / 60);
     const seconds = remainingTime % 60;
@@ -330,7 +323,7 @@ const PlayWorkout = () => {
               </Text>
             </View>
 
-            <View className="flex-col items-center justify-center mr-5">
+            <View className="flex-col items-center justify-center ml-4">
               <Text className="text-2xl text-white font-bold">
                 {formatTotalTime(totalRemainingSeconds)}
               </Text>
@@ -343,23 +336,21 @@ const PlayWorkout = () => {
               <Text className="text-2xl text-white font-bold">
                 {`${curRepetition} / ${intervals[currentIntervalIndex].repetitions}`}
               </Text>
-              <Text className="text-md text-white font-semibold">TIMERS</Text>
+              <Text className="text-md text-white font-semibold">
+                REPETITIONS
+              </Text>
             </View>
           </View>
         </Card>
 
         <View className="flex flex-row justify-between mt-16 px-5 items-center gap-4">
           <TouchableOpacity
-            onPress={handleNextTimer}
+            onPress={handleCompleteTimer}
             style={{
               backgroundColor: 'rgba(255,255,255,0.2)',
               borderRadius: 15,
             }}
             className="flex flex-col items-center justify-center w-28 h-28 py-2"
-            disabled={
-              intervals[currentIntervalIndex].timers.length - 1 ===
-              curTimerIndex
-            }
           >
             <AntDesign name="stepforward" size={28} color="#fff" />
             <Text className="text-md text-white font-semibold">NEXT</Text>
