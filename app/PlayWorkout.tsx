@@ -42,6 +42,7 @@ const PlayWorkout = () => {
   const [curRepetition, setCurRepetition] = useState(1);
   const [isPlaying, setIsPlaying] = useState(true);
   const [totalRemainingSeconds, setTotalRemainingSeconds] = useState(-1);
+  const [remainingTimerTime, setRemainingTimerTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -156,6 +157,10 @@ const PlayWorkout = () => {
   };
 
   const handleCompleteTimer = () => {
+    if (remainingTimerTime !== 0) {
+      setTotalRemainingSeconds((prev) => prev - remainingTimerTime);
+    }
+
     // If there is another timer in the current interval
     if (curTimerIndex < curTimers.length - 1) {
       setCurTimerIndex((prev) => prev + 1);
@@ -259,6 +264,10 @@ const PlayWorkout = () => {
       <View className="flex-1 items-center justify-center">
         <CountdownCircleTimer
           onUpdate={async (remainingTime) => {
+            if (remainingTime !== remainingTimerTime) {
+              setRemainingTimerTime(remainingTime);
+            }
+
             if (
               settings?.countdownSoundSeconds &&
               settings?.countdownSoundSeconds >= remainingTime &&
