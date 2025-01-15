@@ -3,7 +3,7 @@ import { TouchableOpacity, View, Alert } from 'react-native';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { useLocalSearchParams } from 'expo-router';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
@@ -130,7 +130,7 @@ const PlayWorkout = () => {
 
   const completeWorkout = () => {
     // Calculate final workout stats
-    const totalTime = intervals.reduce((acc, interval) => {
+    const intialTotalWorkoutTime = intervals.reduce((acc, interval) => {
       const intervalTime = interval.timers.reduce(
         (timerAcc, timer) => timerAcc + (timer.minutes * 60 + timer.seconds),
         0
@@ -138,12 +138,14 @@ const PlayWorkout = () => {
       return acc + intervalTime * interval.repetitions;
     }, 0);
 
+    const totalTimeCompleted = intialTotalWorkoutTime - totalRemainingSeconds;
+
     router.push({
       pathname: '/WorkoutComplete',
       params: {
         stats: JSON.stringify({
           // Total Time in seconds
-          totalTime,
+          totalTime: totalTimeCompleted,
           totalIntervals: intervals.length,
           totalRepetitions: intervals.reduce(
             (acc, interval) => acc + interval.repetitions,
@@ -382,24 +384,16 @@ const PlayWorkout = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={handleNextInterval}
+            onPress={completeWorkout}
             style={{
               backgroundColor: 'rgba(255,255,255,0.2)',
               borderRadius: 15,
             }}
             className="flex flex-col items-center justify-center py-2 w-28 h-28"
           >
-            <AntDesign name="forward" size={28} color="#fff" />
-            <Text className="text-md text-white font-semibold">
-              {currentIntervalIndex === intervals.length - 1
-                ? 'FINISH'
-                : 'NEXT'}
-            </Text>
-            <Text className="text-md text-white font-semibold">
-              {currentIntervalIndex === intervals.length - 1
-                ? 'WORKOUT'
-                : 'INTERVAL'}
-            </Text>
+            <FontAwesome5 name="flag-checkered" size={28} color="#fff" />
+            <Text className="text-md text-white font-semibold">FINISH</Text>
+            <Text className="text-md text-white font-semibold">WORKOUT</Text>
           </TouchableOpacity>
         </View>
       </View>
