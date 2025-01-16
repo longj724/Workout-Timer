@@ -1,6 +1,6 @@
 // External Dependencies
 import { TouchableOpacity, View, Alert } from 'react-native';
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 import { useLocalSearchParams } from 'expo-router';
 import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
@@ -140,6 +140,8 @@ const PlayWorkout = () => {
 
     const totalTimeCompleted = intialTotalWorkoutTime - totalRemainingSeconds;
 
+    setIsPlaying(false);
+
     router.push({
       pathname: '/WorkoutComplete',
       params: {
@@ -187,15 +189,6 @@ const PlayWorkout = () => {
       }
     }
   };
-
-  const handleNextInterval = useCallback(() => {
-    if (currentIntervalIndex === intervals.length - 1) {
-      completeWorkout();
-    } else {
-      setCurrentIntervalIndex((prev) => prev + 1);
-      setKey(`${currentIntervalIndex + 1},0,1`);
-    }
-  }, [currentIntervalIndex, intervals.length]);
 
   const handlePlayPause = () => {
     setIsPlaying((prev) => !prev);
