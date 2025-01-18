@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { CreateWorkoutInput, createWorkoutSchema } from '../lib/types';
 import { useAuth } from '@clerk/clerk-expo';
 
-const API_URL = 'http://localhost:9999';
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const useCreateWorkout = () => {
   const queryClient = useQueryClient();

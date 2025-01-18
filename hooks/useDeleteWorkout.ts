@@ -5,7 +5,7 @@ import { useAuth } from '@clerk/clerk-expo';
 
 // Internal Dependencies
 
-const API_URL = 'http://localhost:9999';
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const useDeleteWorkout = () => {
   const queryClient = useQueryClient();

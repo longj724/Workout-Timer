@@ -6,7 +6,7 @@ import { useAuth } from '@clerk/clerk-expo';
 // Internal Dependencies
 import { WorkoutsList } from '../lib/types';
 
-const API_URL = 'http://localhost:9999';
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const useGetWorkouts = () => {
   const { getToken } = useAuth();
@@ -19,6 +19,8 @@ export const useGetWorkouts = () => {
           Authorization: `Bearer ${await getToken()}`,
         },
       });
+
+      console.log('response', response);
 
       if (!response.ok) {
         throw new Error('Failed to fetch workouts');

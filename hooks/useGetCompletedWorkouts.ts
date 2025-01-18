@@ -9,7 +9,7 @@ import {
   getCompletedWorkoutsSchema,
 } from '../lib/types';
 
-const API_URL = 'http://localhost:9999';
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const useGetCompletedWorkouts = (
   workoutData: GetCompletedWorkoutInput
